@@ -1,0 +1,18 @@
+[project]
+name = "rodrigo-labtfg"
+version = "0.1.0"
+description = "Programa para el diseño de secuencias"
+authors = [
+    {name = "luksgrin",email = "lugoibel@doctor.upv.es"},
+    {name = "Julio",email = "jcochenta@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
