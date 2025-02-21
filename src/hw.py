@@ -17,7 +17,6 @@ with open(fasta_file) as file:
             seq += line  # Acumulamos la secuencia
 
 # Al final, procesamos la última secuencia
-if seq:
     sequence.append(seq)
 
     nc = seq.count("C")
