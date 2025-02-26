@@ -1,38 +1,23 @@
+from Bio import SeqIO
 from Bio.Seq import Seq
 import sys
+
 fasta_file = sys.argv[1]
 
-name_seq = []
-sequence = []
-seq = ""
+# se lee la secuencia usando SeqIO
+record = next(SeqIO.parse(fasta_file, "fasta")) 
+# definimos el nombre y la secuencia
+name = record.id
+seq = record.seq
+# para calcular el porcetaje de citosina
+nc = seq.count("C")
+per = (nc / len(seq))*100
 
-# Abrir y leer el archivo
-with open(fasta_file) as file:
-    for line in file:
-        line = line.strip("\n")  # Eliminar saltos de línea
-        if line.startswith(">"):  # Encabezado de la secuencia
-            name = line[1:].split(" ")[0]
-            name_seq.append(name)
-        else:  # Parte de la secuencia
-            seq += line  # Acumulamos la secuencia
+# paso opcional que hago para ver las funciones de Biopython
+proteina = seq.translate() # asi de facil xd
 
-# Al final, procesamos la última secuencia
-    sequence.append(seq)
-
-    nc = seq.count("C")
-    per = (nc / len(seq)) * 100
-    print(f"Nombre: {name_seq}")
-    print(f"Secuencia: {seq}")
-    print(f"Longitud: {len(seq)}")
-    print(f"Porcentaje de C: {per:.4f}%")
-
-    # traduzco a proteina
-
-    my_dna = Seq(seq)
-    my_prot= my_dna.translate()
-
-    print(f"Poteina teórica que se traduciría: {my_prot}")
-
-
-
-            
+# sacar por pantalla los resultados
+print(f"Nombre de la secuencia: {name} y longitud: {len(seq)}")
+print(f"Secuencia: {seq}")
+print(f"Porcentaje de C: {per:.4f}%")
+print(f"Proteína teórica traducida: {proteina}")
