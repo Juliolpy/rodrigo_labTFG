@@ -27,10 +27,3 @@ def find_NGG_motivs(seq_name: dict) -> dict:
       positions[seq_id] = position_list
    return positions
 
-# llamamos a las funciones
-seq_name = read_fasta(fasta_file)
-NGG_positions = find_NGG_motivs(seq_name)
-# vemos los resultados
-
-for seq_id, pos in NGG_positions.items():
-   print(f"La Secuencia correspondiente con nombre: {seq_id}, tiene {len(pos)} motivos NGG en las posiciones {pos}")
