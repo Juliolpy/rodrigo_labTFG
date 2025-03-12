@@ -3,17 +3,14 @@
 # Devuelvan esas posiciones.
 
 # importamos el modulo sys y Seq de Biopython
-import sys
 from Bio.Seq import Seq
 from Bio import SeqIO
-
-fasta_file = sys.argv[1]
 
 def read_fasta(fastafile: str) -> dict:
    # creamos un diccionario donde guardemos las secuencias
    seq_name = {}
    # nombre y secuencia
-   for record in SeqIO.parse(fasta_file, "fasta"):
+   for record in SeqIO.parse(fastafile, "fasta"):
       seq_name[record.id] = str(record.seq)
    return seq_name
 
