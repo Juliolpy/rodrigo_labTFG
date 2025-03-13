@@ -1,7 +1,7 @@
 import re
 import sys
 
-sequence = input(str("introduce la secuecia de interés para encontrar sitios de restriccion BamHI: "))
+sequence = input(str("introduce la secuecia de interés para encontrar sitios de restriccion BamHI, Recuerda que es  < 'GGATCC'> : "))
 
 def search_restriction_sites(sequence: str) -> dict:
     """
@@ -35,7 +35,7 @@ def main():
     # Buscamos las posiciones de los sitios de corte de las enzimas
     cuantos, sitio = search_restriction_sites(sequence)
 
-    encontro = "Se encontró" if len(cuantos) == 1 else "Se econtraron"
+    encontro = "Se encontró" if len(cuantos) == 1 else "Se encontraron"
     if len(cuantos) == 1:
         coincidencias = "coincidencia"
     else:
