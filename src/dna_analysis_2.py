@@ -1,6 +1,6 @@
 import re
 
-def search_restriction_sites(sequence: str, enzyme_name: str) -> tuple:
+def search_restriction_sites(sequence: str, enzyme_name: str) -> tuple: # para no poder modificar los valores que nos devuelva
     """
     Busca los sitios de corte de una enzima de restricción específica en una secuencia de ADN.
     
@@ -22,17 +22,17 @@ def search_restriction_sites(sequence: str, enzyme_name: str) -> tuple:
     }
 
     # Verificamos si la enzima está en el diccionario
-    if enzyme_name not in enzymes:
+    if enzyme_name not in enzymes: #  En Python, cuando usas in con un diccionario, por defecto se buscan coincidencias en las claves (keys), no en los valores.
         print("ERROR: Enzyme not found or incorrect name provided")
-        return None, None
+        return None, None # añade valores None si no se encunentra la enzima
 
     # Obtener el patrón de la enzima
-    pattern = enzymes[enzyme_name]
-
+    pattern = enzymes[enzyme_name] # aqui igualamos los values del diccionario a pattern, osea las secuencias que reconocen las enzimas
+    #--> enzymes[enzyme_name] accede a la secuencia de corte de la enzima especificada en enzyme_name dentro del diccionario enzymes
     # Buscar coincidencias en la secuencia
-    matches = list(re.finditer(pattern, sequence))
+    matches = list(re.finditer(pattern, sequence)) # cuantas veces se ha encontrado, convierte el iterador de objetos en una lista
 
-    # Extraer las posiciones donde se encuentran las coincidencias
+    # Extraer las posiciones donde se encuentran las coincidencias, la primera posicion de cada
     positions = [match.start() for match in matches]
 
     return len(matches), positions
