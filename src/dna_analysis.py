@@ -28,7 +28,7 @@ def search_restriction_sites(sequence: str) -> dict:
 # Aquí tendrías que implementar (o importar!) una función que lea un fichero fasta
 # ...
 
-def main(file_path: str) -> None:
+def main():
     # Leemos la secuencia de ADN desde el archivo, usando tu función
     # ... sequence = ....
     
@@ -36,13 +36,17 @@ def main(file_path: str) -> None:
     cuantos, sitio = search_restriction_sites(sequence)
 
     encontro = "Se encontró" if len(cuantos) == 1 else "Se econtraron"
+    if len(cuantos) == 1:
+        coincidencias = "coincidencia"
+    else:
+        coincidencias = "coincidencias"
 
     posicion = "la posición" if len(sitio) == 1 else "las posiciones"
 
     
     # Imprimimos las posiciones encontradas
 
-    print(f"{encontro} {len(cuantos)} coincidencia en {posicion} {sitio} con el sitio de corte de BamHI: {cuantos}")
+    print(f"{encontro} {len(cuantos)} {coincidencias} en {posicion} {sitio} con el sitio de corte de BamHI: GGATCC")
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main()
