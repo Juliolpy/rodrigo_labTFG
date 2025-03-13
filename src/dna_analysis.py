@@ -15,9 +15,12 @@ def search_restriction_sites(sequence: str) -> dict:
     """
     # Definimos los patrones para cada enzima
     pattern = 'GGATCC' # Sitio de corte de BamHI
-    sitios = re.findall(pattern,sequence) # he usado findall, creo que es más sencillo
+    numero = re.findall(pattern,sequence) # he usado findall, creo que es más sencillo
 
-    return sitios
+    lugares = [match.start() for match in re.finditer(pattern, sequence)] # lista con los lugares donde esta
+
+
+    return numero, lugares
     
     # Buscamos las posiciones de cada patrón en la secuencia
      # Has visto esta manera de construir una lista? Echale un vistazo a https://ellibrodepython.com/list-comprehension-python
@@ -30,10 +33,16 @@ def main(file_path: str) -> None:
     # ... sequence = ....
     
     # Buscamos las posiciones de los sitios de corte de las enzimas
-    results = search_restriction_sites(sequence)
+    cuantos, sitio = search_restriction_sites(sequence)
+
+    encontro = "Se encontró" if len(cuantos) == 1 else "Se econtraron"
+
+    posicion = "la posición" if len(sitio) == 1 else "las posiciones"
+
     
     # Imprimimos las posiciones encontradas
-    print(f"Se encontraron {len(results)} posiciones con el sitio de corte de BamHI: {results}")
+
+    print(f"{encontro} {len(cuantos)} coincidencia en {posicion} {sitio} con el sitio de corte de BamHI: {cuantos}")
 
 if __name__ == "__main__":
     main(sys.argv[1])
