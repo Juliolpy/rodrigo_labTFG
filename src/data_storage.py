@@ -109,10 +109,10 @@ def main() -> None:
     print(f"Datos de archivo json: {loaded_json}")
 
     loaded_pickle = read_pickle("data.pkl")
-    print(f"Datos del archivo pickle{loaded_pickle}")
+    print(f"Datos del archivo pickle: {loaded_pickle}")
 
 if __name__ == "__main__":
-         main()
+    main()
 
 
         
