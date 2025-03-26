@@ -74,16 +74,23 @@ class ColumboParts:
       """
       score_list = [ self.calc_1() , self.calc_2(), self.calc_3(), self.calc_4()] # recuerda usar () para ejecutar las funciones
       return score_list
-      
-   
-      
-     
-      
+    
+   # Función para calcular la temperatura de melting del protospacer
    def calcular_tm(self):
+      """
+      Args : objeto seq del constructor, el protospacer
+      Return : int correspondiente a la Tm_NN
+      """
       melting = mt.Tm_NN(self.protospacer) if self.protospacer else 0 # para calcular la tm del protospcaer
       return melting
-      # transformar el self en diccionairo para qeu pueda ser transfomrado en json
+   
+   # transformar el self en diccionairo para qeu pueda ser transfomrado en json
    def to_dict(self):
+     """
+     Args : objetos seq del constructor
+     Return : diccionario con [keys] títulos de cada cosa y [values] los objetos de self definidos en __init__
+     
+     """
      return {
         "PAM" : self.PAM,
         "Protospacer" : self.protospacer,
