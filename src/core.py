@@ -9,13 +9,29 @@ import json
 import pickle
 from Bio.Seq import Seq
 from Bio import SeqIO
+# crea una CLASE para hacer un RAISE para crear excepciones
+class Out_of_frame_ERROR(Exception):
+   """
+   >--Excepción personalizada dentro de una clase para indicar que nuestro archivo tipo Seq no tiene el tamaño requerido--<
 
+   """
+   def __init__(self, mensaje = "El PAM o Protospacer no tienen el tamaño mínimo requerido"):
+      super().__init__(mensaje) # El método super() en Python se usa para llamar a métodos de la superclase (clase padre) desde una subclase.
+      # si no pusieras super, Exception no sabe que existe mensaje, porque nunca lo pasamos a Exception
 # vamos a definir la clase ColumboParts   
 class ColumboParts:
    # definimos constructor --> debe aceptar un string o un objeto Bio.Seq.Seq
    def __init__(self, sequence: Seq, position : int): # sequence es un objeto seq y la positicion un numero entero donde se encuentra cada nt
-      self.PAM = sequence[position : position + 3] if position + 3 <= len(sequence) else ""
-      self.protospacer = sequence[position - 20 : position + 3] if position >= 20 else "" # es la seed_region también
+      # si la posicion + 3 es mayor que la longitud de la secuencia
+      if position + 3 > len(sequence):
+         # saca por pantalla el error de la clase definida arriba
+         raise Out_of_frame_ERROR("El PAM no puede calcularse porque se excede la longitud de la secuencia")
+      self.PAM = sequence[position : position + 3]
+      # si la posicion es menor de 20
+      if position < 20: 
+         # saca por pantalla el error definido en la clase de arriba
+         raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
+      self.protospacer = sequence[position - 20 : position + 3] 
       self.position = position
       self.scores = self.calcular_scores ()
       self.score_medio = sum(self.scores) / len(self.scores) if self.scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
