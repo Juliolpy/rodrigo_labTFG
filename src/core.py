@@ -15,26 +15,69 @@ class ColumboParts:
    # definimos constructor --> debe aceptar un string o un objeto Bio.Seq.Seq
    def __init__(self, sequence: Seq, position : int): # sequence es un objeto seq y la positicion un numero entero donde se encuentra cada nt
       self.PAM = sequence[position : position + 3] if position + 3 <= len(sequence) else ""
-      self.protospacer = sequence[position - 20 : position + 3] if position >= 20 else ""
+      self.protospacer = sequence[position - 20 : position + 3] if position >= 20 else "" # es la seed_region también
       self.position = position
       self.scores = self.calcular_scores ()
       self.score_medio = sum(self.scores) / len(self.scores) if self.scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
       self.tm = self.calcular_tm()
+   """
+    >--- Funciones separadas / Consejo del Luksgrin ---<
+    seed_region = self.protospacer-->  el propio protospacer no coge el PAM
+    En sistemas CRISPR-Cas9, la región semilla es la parte más crítica para la hibridación entre la guía de ARN y el ADN diana
+    Esta región está situada cerca del PAM (NGG) y juega un papel clave en la especificidad y estabilidad de la unión -> es donde se calculan los scores
+    los scores funcionan 1 para verdad y 0 para falso
+   """
+   def calc_1(self): # 1
+      """
+      Función 1
+      -->El contenido de la seed_region de GC ha de ser meno de 80%
+      
+      """
+      score_1 = 1 if (self.protospacer.count("G") + self.protospacer.count("C")) / len(self.protospacer) < 0.8 else 0
+      return score_1 # primer score
+   
+   def calc_2(self): # 2
+      """
+      Función 2
+      --> Que no haya una G antes de la PAM NGG
+      
+      """
+      score_2 = 0 if self.protospacer[-5] == "G" else 1
+      return score_2 # segundo score
+   
+   def calc_3(self): # 3
+      """
+      Función 3
+      --> Que no haya una T 2 posiciones upstream de la PAM, ej: 5' -----TXNGG---> 3'
+      
+      """
+      score_3 = 1 if self.protospacer[-7] != "T" else 0
+      return score_3 # tercer score
+   
+   def calc_4(self): # 4
+      """
+      Función 4
+      --> Que no haya ningun triplete de la misma base, AAA, CCC , TTT , GGG
+      
+      """
+      score_4 = 1 if not any(x * 3 in self.protospacer for x in "ATCG") else 0
+      return score_4 # cuarto score
+   
 
-      # definimos la función del score
-   def calcular_scores(self):
-      # ponemos la seed_region
-      seed_region = self.protospacer[-12:-4] # cogemos los nucleotidos y nos aseguramos que no coja el PAM
-      # En sistemas CRISPR-Cas9, la región semilla es la parte más crítica para la hibridación entre la guía de ARN y el ADN diana
-      # Esta región está situada cerca del PAM (NGG) y juega un papel clave en la especificidad y estabilidad de la unión -> es donde se calculan los scores
-      # los scores funcionan 1 para verdad y 0 para falso y hacemos una lista con ellos para tenerlos encapsulados
-      scores = [
-         1 if (seed_region.count("G") and seed_region.count("C")) / len(seed_region) < 0.8 else 0, # el contenido de la seed_region de GC ha de ser meno de 80%
-         1 if self.protospacer[-5] == "G" else 0, # que no haya una G antes de la PAM NGG
-         1 if self.protospacer[-7] != "T" else 0, # que ni haya una T 2 posiciones upstream de la PAM 5' -----TXNGG---> 3'
-         1 if not any(x * 3 in seed_region for x in "ATCG") else 0 # que no haya ningun triplete de la misma base, AAA, CCC , TTT , GGG   
-      ]
-      return scores
+   # definimos la función del score_global
+   def calcular_scores(self): # GLOBAL
+      """
+      Función global que suma todas las funciones definidas anteriores
+      Args : seed_region, el propio protospacer, no hace falta que definamos un valor de seed_region
+      return : lista de valores, score
+      
+      """
+      score_list = [ self.calc_1() , self.calc_2(), self.calc_3(), self.calc_4()] # recuerda usar () para ejecutar las funciones
+      return score_list
+      
+   
+      
+     
       
    def calcular_tm(self):
       melting = mt.Tm_NN(self.protospacer) if self.protospacer else 0 # para calcular la tm del protospcaer
