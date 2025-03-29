@@ -14,69 +14,168 @@ class Out_of_frame_ERROR(Exception):
    """
    >--Excepción personalizada dentro de una clase para indicar que nuestro archivo tipo Seq no tiene el tamaño requerido--<
 
+   :param mensaje: Mensaje de error por tamaño
+   :type mensaje: str
+
    """
    def __init__(self, mensaje = "El PAM o Protospacer no tienen el tamaño mínimo requerido"):
       super().__init__(mensaje) # El método super() en Python se usa para llamar a métodos de la superclase (clase padre) desde una subclase.
       # si no pusieras super, Exception no sabe que existe mensaje, porque nunca lo pasamos a Exception
+
 # vamos a definir la clase ColumboParts   
 class ColumboParts:
-   # definimos constructor --> debe aceptar un string o un objeto Bio.Seq.Seq
-   def __init__(self, sequence: Seq, position : int): # sequence es un objeto seq y la positicion un numero entero donde se encuentra cada nt
-      # si la posicion + 3 es mayor que la longitud de la secuencia
+   """
+   Clase donde se almacenan las instancias correspondientes al score y tm
+
+   :param sequence: Objeto Seq a analizar
+   :type sequence: Seq
+   :param position: Posición de la repetición NGG (sitio PAM)
+   :type position: int
+
+   """
+   def __init__(self, sequence: Seq, position : int): 
+      """
+      Función Constructora donde sequence es un objeto seq y la posición un número entero donde se encuentra cada nt
+      si la posición + 3 es mayor que la longitud de la secuencia
+
+      :raises TypeError: Error obj Seq &/o int no reconocido
+
+      ..note::
+         Este programa solo admite objetos Seq: .fasta
+
+      ..warning::
+         No usar floats
+      
+      """
       if position + 3 > len(sequence):
          # saca por pantalla el error de la clase definida arriba
          raise Out_of_frame_ERROR("El PAM no puede calcularse porque se excede la longitud de la secuencia")
-      self.PAM = sequence[position : position + 3]
+      self._pam = sequence[position : position + 3]
       # si la posicion es menor de 20
       if position < 20: 
          # saca por pantalla el error definido en la clase de arriba
          raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
-      self.protospacer = sequence[position - 20 : position + 3] 
-      self.position = position
-      self.scores = self.calcular_scores ()
-      self.score_medio = sum(self.scores) / len(self.scores) if self.scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
-      self.tm = self.calcular_tm()
-   """
-    >--- Funciones separadas / Consejo del Luksgrin ---<
-    seed_region = self.protospacer-->  el propio protospacer no coge el PAM
-    En sistemas CRISPR-Cas9, la región semilla es la parte más crítica para la hibridación entre la guía de ARN y el ADN diana
-    Esta región está situada cerca del PAM (NGG) y juega un papel clave en la especificidad y estabilidad de la unión -> es donde se calculan los scores
-    los scores funcionan 1 para verdad y 0 para falso
-   """
-   def calc_1(self): # 1
+      self._protospacer = sequence[position - 20 : position + 3] 
+      self._position = position
+      self._scores = self.calcular_scores ()
+      self._score_medio = sum(self._scores) / len(self._scores) if self._scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
+      self._tm = self.calcular_tm()
+   
+   # redefinimos todos los atributos usando @property
+   
+   @property
+   def pam(self): # PAM
       """
-      Función 1
-      -->El contenido de la seed_region de GC ha de ser meno de 80%
+      Getter para el atributo privado _pam
+
+      :return: Valor del atributo pam
+      :rtype: int
       
       """
-      score_1 = 1 if (self.protospacer.count("G") + self.protospacer.count("C")) / len(self.protospacer) < 0.8 else 0
+      return self._pam
+   @property
+   def position(self): # POSITION
+      """
+      Getter para el atributo privado _position
+
+      :return: Valor del atributo position
+      :rtype: int
+      
+      """
+      return self._position
+   @property
+   def protospacer(self): # PROTOSPACER
+      """
+      Getter para el atributo privado _protospacer
+
+      :return: Valor del atributo protospacer
+      :rtype: str
+      
+      """
+      return self._protospacer
+   
+   @property
+   def scores(self): #SCORE
+      """
+      Getter para el atributo privado _scores
+
+      :return: Valor del atributo _scores
+      :rtype: int
+      
+      """
+      return self._scores
+   
+   @property
+   def score_medio(self):  #SCORE_MEDIO
+      """
+      Getter para el atributo privado _score_medio
+
+      :return: Valor del atributo score_medio
+      :rtype: int
+      
+      """
+      return self._score_medio
+   
+   @property
+   def tm(self):  # TM
+      """
+      Getter para el atributo privado _tm
+
+      :return: Valor del atributo tm
+      :rtype: str
+      
+      """
+      return self._tm
+      
+   # Funciones separadas
+   def calc_1(self): # 1
+      """
+      Función 1 -->El contenido de la seed_region de GC ha de ser meno de 80%
+      Suma 1 si el contendo de G + C dividido entre la longitud del protospacer es menor a 0.8
+
+      :return: primer score
+      :rtype: int
+
+      
+      """
+      score_1 = 1 if (self._protospacer.count("G") + self._protospacer.count("C")) / len(self._protospacer) < 0.8 else 0
       return score_1 # primer score
    
    def calc_2(self): # 2
       """
-      Función 2
-      --> Que no haya una G antes de la PAM NGG
+      Función 2--> Que no haya una G antes de la PAM NGG
+      Suma 1 en el caso de que no haya un G antes de la PAM upstream, si no es 0
+
+
+      :return: segundo score
+      :rtype: int
       
       """
-      score_2 = 0 if self.protospacer[-5] == "G" else 1
+      score_2 = 0 if self._protospacer[-5] == "G" else 1
       return score_2 # segundo score
    
    def calc_3(self): # 3
       """
-      Función 3
-      --> Que no haya una T 2 posiciones upstream de la PAM, ej: 5' -----TXNGG---> 3'
+      Función 3--> Que no haya una T 2 posiciones upstream de la PAM, ej: 5' -----TXNGG---> 3'
+      Suma 1 en el caso de que no haya una T 2 posiciones upstream, si no es 0
+
+      :return: tercer score
+      :rtype: int
       
       """
-      score_3 = 1 if self.protospacer[-7] != "T" else 0
+      score_3 = 1 if self._protospacer[-7] != "T" else 0
       return score_3 # tercer score
    
    def calc_4(self): # 4
       """
-      Función 4
-      --> Que no haya ningun triplete de la misma base, AAA, CCC , TTT , GGG
+      Función 4--> Que no haya ningun triplete de la misma base, AAA, CCC , TTT , GGG
+      Suma 1 en el caso de que no hayan repeticiones de trinucleótidos de la misma base, si no es 0
+
+      :return: cuarto score
+      :rtype: int
       
       """
-      score_4 = 1 if not any(x * 3 in self.protospacer for x in "ATCG") else 0
+      score_4 = 1 if not any(x * 3 in self._protospacer for x in "ATCG") else 0
       return score_4 # cuarto score
    
 
@@ -84,8 +183,8 @@ class ColumboParts:
    def calcular_scores(self): # GLOBAL
       """
       Función global que suma todas las funciones definidas anteriores
-      Args : seed_region, el propio protospacer, no hace falta que definamos un valor de seed_region
-      return : lista de valores, score
+      :return: lista de scores
+      :rtype: list
       
       """
       score_list = [ self.calc_1() , self.calc_2(), self.calc_3(), self.calc_4()] # recuerda usar () para ejecutar las funciones
@@ -94,31 +193,57 @@ class ColumboParts:
    # Función para calcular la temperatura de melting del protospacer
    def calcular_tm(self):
       """
-      Args : objeto seq del constructor, el protospacer
-      Return : int correspondiente a la Tm_NN
+      Devuelve la temperatura de melting del protospacer
+
+      :return: Temperatura de melting del prospacer
+      :rtype: str
+
       """
-      melting = mt.Tm_NN(self.protospacer) if self.protospacer else 0 # para calcular la tm del protospcaer
+      melting = mt.Tm_NN(self._protospacer) if self._protospacer else 0 # para calcular la tm del protospcaer
       return melting
    
    # transformar el self en diccionairo para qeu pueda ser transfomrado en json
    def to_dict(self):
      """
-     Args : objetos seq del constructor
-     Return : diccionario con [keys] títulos de cada cosa y [values] los objetos de self definidos en __init__
+    Convierte la instancia de la clase en un diccionario
      
+     :return: diccionario con [keys] títulos de cada cosa y [values] los objetos de self definidos en __init__
+     :rtype: dict
+
      """
      return {
-        "PAM" : self.PAM,
-        "Protospacer" : self.protospacer,
+        "PAM" : self.pam,
+        "Protospacer" : self.protospacer,     # añadido el underscore
         "Position" : self.position,
         "Scores" : self.scores,
         "Score_medio" : self.score_medio,
         "Tm" : self.tm
      }
+   def to_json(self):
+      """
+      Serializa la instancia en formato JSON
+
+      :return: JSONI con objetos ColumboParts
+      :rtype: str
+
+      
+      """
+      return json.dumps(self.to_dict()) # json lee los datos y los almacena
+
 
 # estas funciones behind the musgo, fuera de la clase
 def read_fasta(fastafile: str) -> dict:
-   # creamos un diccionario donde guardemos las secuencias
+   """
+   Función que se encarga de leer el archivo con extensión .fasta que se introduce
+
+   :param fastafile: Archivo fasta a analizar
+   :type fastafile: str
+
+   :return: String con los nombres y su secuencia correspondiente
+   :rtype: str
+   
+   """
+   
    seq_name = {}
    # nombre y secuencia
    for record in SeqIO.parse(fastafile, "fasta"):
@@ -126,8 +251,18 @@ def read_fasta(fastafile: str) -> dict:
    return seq_name
 
 def find_NGG_motivs(seq_name: dict) -> dict:
+   """
+   Función que se encarga de encontrar las PAM (motivos NGG) dentro de la sencuencia del fasta
+
+   :param seq_name: Diccionario que contiene nombres y sus secuencias correspondientes
+   :type seq_name: dict
+
+   :return: Diccionario con las posiciones de los motivos NGG para cada secuencia
+   :rtype: dict 
+   
+   """
    # diccionario donde guardamos las posiciones de los motivos NGG
-   motifs = {}
+   motifs = {} # seq_nombre = número de motivos
 
    for seq_id, seq in seq_name.items():
       # esta línea: i + 1 for i in range(len(seq)-2) --> hace que no nos salgamos del indice 
@@ -135,10 +270,19 @@ def find_NGG_motivs(seq_name: dict) -> dict:
       motifs[seq_id] = motifs_list
    return motifs  
 
-# funcion para procesar el genoma y convertirlo en columboparts
-#  procesa el genoma identificando los sitios donde aparece el motivo NGG y
-#  crea objetos ColumboParts para cada uno, los evalúa y devuelve los 20 mejores candidatos ordenados por su score_medio.
 def process_genome(seq_name: dict, motifs: dict) -> list:
+   """
+   Función que procesa un fasta, identifica los sitios NGG y crea  objetos ColumboParts 
+   para cada uno, los evalúa y devuelve los 20 mejores candidatos ordenados por su score_medio
+   
+   :param seq_name: Diccionario con el nombre [keys] y su correspondiente secuencia de fasta [values]
+   :type seq_name: dict
+   :param motifs: Diccionario con las posiciones de cada motivo NGG
+
+   :return: Lista creada tras evaluar los diccionarios con las instancias de ColumboParts
+   :rtype: list
+   
+   """
    columbo_list = []
    for seq_id, positions in motifs.items():
       for pos in positions:
@@ -147,10 +291,18 @@ def process_genome(seq_name: dict, motifs: dict) -> list:
             # ahora para quedarnos con los 20 mejores solo
             columbo_list.sort(key= lambda x : x.score_medio, reverse= True)
    return columbo_list[:20]
+ 
+def output_NGG_json(motifs: dict) -> dict:  #JSON
+      """
+      Devuelve un archivo json con los objetos creados por ColumboParts
 
-# funcion para serializar los ouput de las funciones 
-def output_NGG_json(motifs: dict) -> dict:
-# JSON
+      :param motifs: Diccionario con las posiciones de los motivos NGG
+      :type: dict
+
+      :return: Diccionario en formato .json
+      :rtype: dict
+      
+      """
    # guardamos los datos en json en file
       with open("output_NGG.json", "w") as file:
          json.dump([obj.to_dict() for obj in motifs], file, indent=4)
@@ -159,8 +311,18 @@ def output_NGG_json(motifs: dict) -> dict:
          json_positions = json.load(file)
 
 
-def output_NGG_pickle(motifs: dict) -> dict:
-# pickle
+def output_NGG_pickle(motifs: dict) -> dict:    # PICKLE
+   """
+      Devuelve un archivo pickle con los objetos creados por ColumboParts
+      
+      :param motifs: Diccionario con las posiciones de los motivos NGG
+      :type: dict
+
+      :return: Diccionario en formato .json
+      :rtype: dict
+      
+      """
+
     # guardamos los datos en pickle en file
    with open("output_NGG.pkl", "wb") as file:
       pickle.dump([obj.to_dict() for obj in motifs], file)
