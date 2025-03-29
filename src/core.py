@@ -229,7 +229,35 @@ class ColumboParts:
       
       """
       return json.dumps(self.to_dict()) # json lee los datos y los almacena
+   
+   @classmethod
+   def from_parts(cls, sequence, data):
+      """
+      Creamos una instancia en la clase ColumboParts a partir del diccionario
+      :param sequence: Secuencia completa donde se encuentran el PAM y protospacer.
+      :type sequence: Seq
+      :param data: Diccionario con los datos necesarios para reconstruir la instancia.
+      :type data: dict
+      :return: Instancia de ColumboParts
+      :rtype: ColumboParts
 
+      """
+      return cls(sequence, data["Position"])
+   @classmethod
+   def from_json(cls, sequence, json_str):
+      """
+      Creamos una instancia en la clase ColumboParts a partir un str JSON
+
+      :param sequence: Secuencia completa donde se encuentran el PAM y protospacer.
+      :type sequence: Seq
+      :param json_str: JSON con los datos de la instancia.
+      :type json_str: str
+      :return: Instancia de ColumboParts
+      :rtype: ColumboParts
+
+      """
+      data = json.loads(json_str)
+      return cls.from_parts(sequence, data)
 
 # estas funciones behind the musgo, fuera de la clase
 def read_fasta(fastafile: str) -> dict:
