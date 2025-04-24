@@ -5,11 +5,9 @@
 # para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.
 import argparse
 import shutil
-if not shutil.which("primer3_core"):
-    raise EnvironmentError("❌ El programa 'primer3_core' no está instalado o no está en el PATH.")
 # importamos las funciones del codigo
 from core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
-from core_2 import primer3_design, parse_primers_output, output_pimers_json, output_primers_pickle
+from core_2 import primer3_design, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -61,7 +59,7 @@ def main() -> None:
             print(f"-----ColumboPart nº {counter}-----")
             print(f" PAM: {obj._pam}")
             print(f" Protospacer: {obj._protospacer}")
-            print(f" Localización en el genoma: {obj._position}")
+            print(f" Localización del protospacer en el genoma: {obj._position}")
             print(f" Temperatura de melting (Tm): {obj._tm:.2f}°C")
             print(f" Scores individuales: {obj._scores}")
             print(f" Score global: {obj._score_medio:.2f}")
