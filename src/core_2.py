@@ -3,39 +3,37 @@
 
 # importamos el módulo subprocess para lanzar programas externos dentro de nuestro script
 import subprocess
+import re
 import json
 import pickle
-from core import read_fasta
 # Para que primer3 pueda trabajar necesita un tipo de archivo especial
-def primer3_design(fastafile: str) -> dict:
+def primer3_design_columbo(sequence: str, pam_position: int) -> str:
    """
-   Función que utiliza programa primer3 invocado con subprocess, toma como input un fasta (str) y saca los diseños de primers (stdout)
+   Función que utiliza programa primer3  invocado con subprocess para diseñar primers, toma como input: una secuencia y la posicion del pam
 
-   :param fastafile: Archivo fasta como input para primer3
-   :type fastafile: str
+   :param sequence: secuencia a pasar a primer3
+   :type sequence: str
 
-   :return: diseño de primers Forward y Reverse para PCR
-   :rtype: dict
+   :return: diseño de primers Forward y Reverse para las regiones upstream y downstream del protospacer
+   :rtype: str
    
    """
-   seq_name = read_fasta(fastafile)
-   for seq_id, seq in seq_name.items():
-      seq_name[seq_id] = seq
+   # todo en mayúsculas
+   sequence = sequence.upper()
+   # limpiamos secuencia, eliminamos cualquier cosa que no sea A, T, C o G
+   sequence = re.sub(r'[^ATCG]', '', sequence) 
    # Creamos el contenido con formato válido
    primer3_input = f"""SEQUENCE_ID=test
-SEQUENCE_TEMPLATE={seq} 
+SEQUENCE_TEMPLATE={sequence} 
+SEQUENCE_TARGET={pam_position - 20}, {23}
+PRIMER_PRODUCT_SIZE_RANGE=65-165
 PRIMER_TASK=generic
 PRIMER_MIN_SIZE=18
 PRIMER_MAX_SIZE=22
 PRIMER_NUM_RETURN=5
 =
 """
-   # ------ df∈[27,42], dr∈[15,100] -------
-   # min = distancia mínima de forward al PAM + tamaño del protospacer + 3 (longitud PAM) + distancia mínima de reverse al PAM
-   # max = distancia máxima de forward al PAM + tamaño del protospacer + 3 + distancia máxima de reverse al PAM
-   # protospacer+PAM ocupa 23 nt, y quieres df∈[27,42], dr∈[15,100], entonces:
-   # PRIMER_PRODUCT_SIZE_RANGE= (27 + 23 + 15, 42 + 23 + 100) = (65, 165)
-
+   
    with open("entry.txt", "w") as f:
       f.write(primer3_input)
 
@@ -54,8 +52,13 @@ PRIMER_NUM_RETURN=5
 
    return output
 
+# ------ df∈[27,42], dr∈[15,100] -------
+   # min = distancia mínima de forward al PAM + tamaño del protospacer + 3 (longitud PAM) + distancia mínima de reverse al PAM
+   # max = distancia máxima de forward al PAM + tamaño del protospacer + 3 + distancia máxima de reverse al PAM
+   # protospacer+PAM ocupa 23 nt, y quieres df∈[27,42], dr∈[15,100], entonces:
+   # PRIMER_PRODUCT_SIZE_RANGE= (27 + 23 + 15, 42 + 23 + 100) = (65, 165)
 
-def score_primers(output: dict, pam_pos: int, protospacer_len: int) -> float:
+def score_primers(output: str, pam_pos: int, protospacer_len: int) -> float:
    """
    Función que evalua la bondad de los primers y las posiciones en las que tienen que unirse
    Dado el dict parseado de Primer3 y la posición del PAM, devuelve un score 0 - 1 combinando:
@@ -124,11 +127,25 @@ def parse_primers_output(output: str) -> dict:
    
    """
    results = {}
+
    for line in output.strip().split("\n"):
-      if line.startswith("PRIMER_LEFT_0_SEQUENCE"):
-         results["Primer_Forward"] = line.split("=")[1].strip()
-      if line.startswith("PRIMER_RIGHT_0_SEQUENCE"):
-         results["Primer_Reverse"] = line.split("=")[1].strip()
+        if line.startswith("PRIMER_LEFT_0="):
+            coords = line.split("=")[1].strip()
+            start, length = map(int, coords.split(","))
+            results["PRIMER_LEFT_0"] = (start, length)
+        elif line.startswith("PRIMER_RIGHT_0="):
+            coords = line.split("=")[1].strip()
+            start, length = map(int, coords.split(","))
+            results["PRIMER_RIGHT_0"] = (start, length)
+        elif line.startswith("PRIMER_LEFT_0_TM="):
+            results["PRIMER_LEFT_0_TM"] = float(line.split("=")[1].strip())
+        elif line.startswith("PRIMER_RIGHT_0_TM="):
+            results["PRIMER_RIGHT_0_TM"] = float(line.split("=")[1].strip())
+        elif line.startswith("PRIMER_LEFT_0_GC_PERCENT="):
+            results["PRIMER_LEFT_0_GC_PERCENT"] = float(line.split("=")[1].strip())
+        elif line.startswith("PRIMER_RIGHT_0_GC_PERCENT="):
+            results["PRIMER_RIGHT_0_GC_PERCENT"] = float(line.split("=")[1].strip())
+
    return results
 
 # pasar los archivos generados del programa a json
