@@ -6,6 +6,8 @@ import subprocess
 import re
 import json
 import pickle
+from Bio.Seq import Seq
+from Bio import SeqIO
 # Para que primer3 pueda trabajar necesita un tipo de archivo especial
 def primer3_design_columbo(sequence: str, pam_position: int) -> str:
    """
@@ -24,7 +26,7 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> str:
    sequence = re.sub(r'[^ATCG]', '', sequence) 
    # Creamos el contenido con formato válido
    primer3_input = f"""SEQUENCE_ID=test
-SEQUENCE_TEMPLATE={sequence} 
+SEQUENCE_TEMPLATE={sequence}
 SEQUENCE_TARGET={pam_position - 20}, {23}
 PRIMER_PRODUCT_SIZE_RANGE=65-165
 PRIMER_TASK=generic
@@ -115,7 +117,7 @@ def score_primers(output: str, pam_pos: int, protospacer_len: int) -> float:
 
 
 # funcion parser para gestionar las salidas del programa primer3
-def parse_primers_output(output: str) -> dict:
+def parse_primers_output(output: str, template_sequence: str) -> dict:
    """
    Función que recoge los datos del archivo generado por primer3 y genera un diccionario rápidamente legible
 
@@ -132,11 +134,18 @@ def parse_primers_output(output: str) -> dict:
         if line.startswith("PRIMER_LEFT_0="):
             coords = line.split("=")[1].strip()
             start, length = map(int, coords.split(","))
+            primer_seq = template_sequence[start: start + length]
             results["PRIMER_LEFT_0"] = (start, length)
+            results["PRIMER_LEFT_0_sequence"] = primer_seq
+            
         elif line.startswith("PRIMER_RIGHT_0="):
             coords = line.split("=")[1].strip()
             start, length = map(int, coords.split(","))
+            primer_seq = template_sequence[start: start + length]
+            primer_seq = str(Seq(primer_seq).reverse_complement())
             results["PRIMER_RIGHT_0"] = (start, length)
+            results["PRIMER_RIGHT_0_sequence"] = primer_seq
+
         elif line.startswith("PRIMER_LEFT_0_TM="):
             results["PRIMER_LEFT_0_TM"] = float(line.split("=")[1].strip())
         elif line.startswith("PRIMER_RIGHT_0_TM="):

@@ -35,8 +35,8 @@ def main() -> None:
     primers_for_obj = {}
     for seq_id, seq in sequences.items():
         for obj in top_candidates:
-            # definir region alrrederor del PAM para diseñar los primers (100nt upstream y downstream)
-            flank = 50
+            # definir region alrrederor del PAM para diseñar los primers ( x nt upstream y downstream)
+            flank = 100
             pam_pos = obj._position
             full_seq = sequences[seq_id] # solo la secuencia del dict
             # controlar los bordes del genoma
@@ -46,7 +46,7 @@ def main() -> None:
             try:
                 # diseñar dichos primers
                 raw_output = primer3_design_columbo(region, pam_pos - start)
-                parsed_primers = parse_primers_output(raw_output)
+                parsed_primers = parse_primers_output(raw_output, region)
                 score = score_primers(parsed_primers, pam_pos-start, protospacer_len=23)
                 primers_for_obj[pam_pos] = {
                     "primers": parsed_primers,
@@ -85,7 +85,7 @@ def main() -> None:
 
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
-                print(f"❌ Error al diseñar los priemrs: {primer_data['error']}")
+                print(f"❌ Error al diseñar los primers: {primer_data['error']}")
             else:
                 print(f"Primers diseñados: {primer_data['primers']}")
                 print(f"Score de primer: {primer_data['score']:.2f}")
