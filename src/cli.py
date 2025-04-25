@@ -4,10 +4,9 @@
 # El fichero cli.py debe importar las funciones de core.py y darle los argumentos adecuados a las mismas
 # para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.
 import argparse
-import shutil
 # importamos las funciones del codigo
 from core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
-from core_2 import primer3_design, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
+from core_2 import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -32,16 +31,37 @@ def main() -> None:
     sequences =  read_fasta(args.fasta)
     NGG_positions = find_NGG_motivs(sequences)
     top_candidates = process_genome(sequences, NGG_positions) # vemos cuales son los resultados de la clase y los almacenamos en la variable top_candidates
-    primers_raw = primer3_design(args.fasta) # con todos los datos de primer3
-    primers = parse_primers_output(primers_raw) # aplicando el parser para unicamente seleccionar los primers
+
+    primers_for_obj = {}
+    for seq_id, seq in sequences.items():
+        for obj in top_candidates:
+            # definir region alrrederor del PAM para diseñar los primers (100nt upstream y downstream)
+            flank = 50
+            pam_pos = obj._position
+            full_seq = sequences[seq_id] # solo la secuencia del dict
+            # controlar los bordes del genoma
+            start = max(0, pam_pos - flank)
+            end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
+            region = full_seq[start:end]
+            try:
+                # diseñar dichos primers
+                raw_output = primer3_design_columbo(region, pam_pos - start)
+                parsed_primers = parse_primers_output(raw_output)
+                score = score_primers(parsed_primers, pam_pos-start, protospacer_len=23)
+                primers_for_obj[pam_pos] = {
+                    "primers": parsed_primers,
+                    "score": round(score, 2)
+                }
+            except Exception as exc:
+                primers_for_obj[pam_pos] = {"error": str(exc)}
     # especificamos el archivo que queremos
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
-        pickle_primers = output_primers_pickle(primers_raw)
+        pickle_primers = output_primers_pickle(raw_output)
         print("📦 Archivos guardados: output_NGG.pkl, output_PRIMERS.pkl")
     else:
         json_file = output_NGG_json(top_candidates)
-        json_primers = output_pimers_json(primers_raw)
+        json_primers = output_pimers_json(raw_output)
         print("📁 Archivos guardados: output_NGG.json, output_PRIMERS.json")
     # imprimir resultados
     for seq_id, pos in NGG_positions.items():
@@ -52,20 +72,24 @@ def main() -> None:
         print(("<" * 170))
         # en este caso no ponemos ningun return porque la funcion main() no la vamos a ejecutar en ningun lado y "and" me iba a devolver solo NGG_positions
         # El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.
-        print("\n🔬 Resultados de análisis CRISPR-Cas9:\n")
-        counter = 0
-        for obj in top_candidates:
-            counter += 1
-            print(f"-----ColumboPart nº {counter}-----")
+        print("\n🔬 Resultados de análisis COLUMBO:\n")
+        for i, obj in enumerate(top_candidates, 1):
+            print(f"-----ColumboPart nº {i}-----")
+            print(f"creada con el archivo: 📁 route -> {args.fasta}")
             print(f" PAM: {obj._pam}")
             print(f" Protospacer: {obj._protospacer}")
             print(f" Localización del protospacer en el genoma: {obj._position}")
             print(f" Temperatura de melting (Tm): {obj._tm:.2f}°C")
             print(f" Scores individuales: {obj._scores}")
             print(f" Score global: {obj._score_medio:.2f}")
-            print("-" * 50)  # Separador entre cada resultado
-        print(f"COLUMBO creada con el archivo: 📁 route -> {args.fasta}")
-        print(f"Candidatos de primers {primers}")
+
+            primer_data = primers_for_obj.get(obj._position, {})
+            if "error" in primer_data:
+                print(f"❌ Error al diseñar los priemrs: {primer_data['error']}")
+            else:
+                print(f"Primers diseñados: {primer_data['primers']}")
+                print(f"Score de primer: {primer_data['score']:.2f}")
+            print("-" * 50)
 
 # para ejecutar la función como principal y que no de error
 
