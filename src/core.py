@@ -9,6 +9,7 @@ import json
 import pickle
 from Bio.Seq import Seq
 from Bio import SeqIO
+import re
 # crea una CLASE para hacer un RAISE para crear excepciones
 class Out_of_frame_ERROR(Exception):
    """
@@ -244,7 +245,7 @@ class ColumboParts:
       """
       return cls(sequence, data["Position"])
    @classmethod
-   def from_json(cls, sequence, json_str):
+   def from_json(cls, sequence, json_str): # cls en vez de self
       """
       Creamos una instancia en la clase ColumboParts a partir un str JSON
 
@@ -275,7 +276,8 @@ def read_fasta(fastafile: str) -> dict:
    seq_name = {}
    # nombre y secuencia
    for record in SeqIO.parse(fastafile, "fasta"):
-      seq_name[record.id] = str(record.seq)
+      clean_seq = re.sub(r'[^ATCG]', '', str(record.seq).upper()) # limpiamos secuencia
+      seq_name[record.id] = clean_seq
    return seq_name
 
 def find_NGG_motivs(seq_name: dict) -> dict:
@@ -313,11 +315,15 @@ def process_genome(seq_name: dict, motifs: dict) -> list:
    """
    columbo_list = []
    for seq_id, positions in motifs.items():
+      sequence = seq_name[seq_id]
       for pos in positions:
-         if pos >= 20: # ya que el protospacer no puede ser menor de 20, nuestro codigo no funcionaria: index out of range
-            columbo_list.append(ColumboParts(seq_name[seq_id], pos)) # objeto seq y un int
-            # ahora para quedarnos con los 20 mejores solo
-            columbo_list.sort(key= lambda x : x.score_medio, reverse= True)
+         # ya que el protospacer no puede ser menor de 20, nuestro codigo no funcionaria: index out of range
+         if pos >= 20 and pos + 3 <= len(sequence):
+            columbo_list.append(ColumboParts(sequence, pos)) # objeto seq y un int
+         else:
+            print(f"[WARNING!!], posición {pos} descartada en {seq_id}:{Out_of_frame_ERROR}")
+   # ahora para quedarnos con los 20 mejores solo
+   columbo_list.sort(key= lambda x : x.score_medio, reverse= True)
    return columbo_list[:20]
  
 def output_NGG_json(motifs: dict) -> dict:  #JSON
@@ -346,7 +352,7 @@ def output_NGG_pickle(motifs: dict) -> dict:    # PICKLE
       :param motifs: Diccionario con las posiciones de los motivos NGG
       :type: dict
 
-      :return: Diccionario en formato .json
+      :return: Diccionario en formato .pickle
       :rtype: dict
       
       """
