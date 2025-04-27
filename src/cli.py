@@ -72,23 +72,34 @@ def main() -> None:
         print(("<" * 170))
         # en este caso no ponemos ningun return porque la funcion main() no la vamos a ejecutar en ningun lado y "and" me iba a devolver solo NGG_positions
         # El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.
+        RED = "\033[91m"
+        CIAN = "\033[96m"
+        GREEN = "\033[92m"
+        GR = "\033[92m"
+        RESET = "\033[0m"
+        MAG = "\033[35m"
+        YELL = "\033[33m"
+        tracrRNA = "GTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTT"
         print("\n🔬 Resultados de análisis COLUMBO:\n")
         for i, obj in enumerate(top_candidates, 1):
             print(f"-----ColumboPart nº {i}-----")
             print(f"creada con el archivo: 📁 route -> {args.fasta}")
-            print(f" PAM: {obj._pam}")
-            print(f" Protospacer: {obj._protospacer}")
-            print(f" Localización del protospacer en el genoma: {obj._position}")
-            print(f" Temperatura de melting (Tm): {obj._tm:.2f}°C")
-            print(f" Scores individuales: {obj._scores}")
-            print(f" Score global: {obj._score_medio:.2f}")
+            print(f" PAM: {GREEN}{obj._pam}{RESET}")
+            print(f" Protospacer: {RED}{obj._protospacer}{RESET}")
+            print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
+            print(f" Temperatura de melting (Tm): {YELL}{obj._tm:.2f}°C{RESET}")
+            print(f" Scores individuales: {YELL}{obj._scores}{RESET}")
+
+            print(f" tracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} :  ")
+            print(f" gRNA resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
+            print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
 
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"❌ Error al diseñar los primers: {primer_data['error']}")
             else:
-                print(f"Primers diseñados: {primer_data['primers']}")
-                print(f"Score de primer: {primer_data['score']:.2f}")
+                print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
+                print(f" Score de primer: {YELL}{primer_data['score']:.2f}{RESET}")
             print("-" * 50)
 
 # para ejecutar la función como principal y que no de error
