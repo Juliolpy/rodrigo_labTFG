@@ -24,6 +24,16 @@ def get_parse() -> argparse.Namespace:
 
 def main() -> None:
 
+    # colores y el tracRNA que es siempre el mismo
+    RED = "\033[91m"
+    CIAN = "\033[96m"
+    GREEN = "\033[92m"
+    GR = "\033[92m"
+    RESET = "\033[0m"
+    MAG = "\033[35m"
+    YELL = "\033[33m"
+    tracrRNA = "GTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTT"
+
     # reclutamos la función get_parse()
     args = get_parse()
 
@@ -62,24 +72,16 @@ def main() -> None:
     else:
         json_file = output_NGG_json(top_candidates)
         json_primers = output_pimers_json(raw_output)
-        print("📁 Archivos guardados: output_NGG.json, output_PRIMERS.json")
+        print(f"📁 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
     # imprimir resultados
     for seq_id, pos in NGG_positions.items():
-        print(f"La Secuencia correspondiente con nombre: {seq_id}, tiene {len(pos)} motivos NGG en las posiciones:")
+        print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")
         print("  ")
         print(">" * 170)
         print(f"{pos}")
         print(("<" * 170))
         # en este caso no ponemos ningun return porque la funcion main() no la vamos a ejecutar en ningun lado y "and" me iba a devolver solo NGG_positions
         # El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.
-        RED = "\033[91m"
-        CIAN = "\033[96m"
-        GREEN = "\033[92m"
-        GR = "\033[92m"
-        RESET = "\033[0m"
-        MAG = "\033[35m"
-        YELL = "\033[33m"
-        tracrRNA = "GTTTTAGAGCTAGAAATAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCGGTGCTTTTTT"
         print("\n🔬 Resultados de análisis COLUMBO:\n")
         for i, obj in enumerate(top_candidates, 1):
             print(f"-----ColumboPart nº {i}-----")
@@ -90,8 +92,8 @@ def main() -> None:
             print(f" Temperatura de melting (Tm): {YELL}{obj._tm:.2f}°C{RESET}")
             print(f" Scores individuales: {YELL}{obj._scores}{RESET}")
 
-            print(f" tracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} :  ")
-            print(f" gRNA resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
+            print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} :  ")
+            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
             print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
 
             primer_data = primers_for_obj.get(obj._position, {})
