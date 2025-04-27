@@ -68,11 +68,11 @@ def main() -> None:
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
         pickle_primers = output_primers_pickle(raw_output)
-        print("📦 Archivos guardados: output_NGG.pkl, output_PRIMERS.pkl")
+        print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
     else:
         json_file = output_NGG_json(top_candidates)
         json_primers = output_pimers_json(raw_output)
-        print(f"📁 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
+        print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
     # imprimir resultados
     for seq_id, pos in NGG_positions.items():
         print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")
@@ -84,8 +84,8 @@ def main() -> None:
         # El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.
         print("\n🔬 Resultados de análisis COLUMBO:\n")
         for i, obj in enumerate(top_candidates, 1):
-            print(f"-----ColumboPart nº {i}-----")
-            print(f"creada con el archivo: 📁 route -> {args.fasta}")
+            print(f">>>>>> ColumboPart nº {i} <<<<<<")
+            print(f"Creada con el archivo: 📁 route -> {args.fasta}")
             print(f" PAM: {GREEN}{obj._pam}{RESET}")
             print(f" Protospacer: {RED}{obj._protospacer}{RESET}")
             print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
@@ -98,7 +98,7 @@ def main() -> None:
 
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
-                print(f"❌ Error al diseñar los primers: {primer_data['error']}")
+                print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
             else:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
                 print(f" Score de primer: {YELL}{primer_data['score']:.2f}{RESET}")
