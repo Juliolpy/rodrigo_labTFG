@@ -7,6 +7,7 @@ import argparse
 # importamos las funciones del codigo
 from core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
 from core_2 import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
+from core_3 import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -53,6 +54,14 @@ def main() -> None:
             start = max(0, pam_pos - flank)
             end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
             region = full_seq[start:end]
+            # funcion beacon
+            prot = obj._protospacer
+            gRNA = prot + tracrRNA
+            beacon = design_beacon(str(prot))
+            beacon_score = score_beacon(beacon, str(prot), gRNA)
+            beacon_struct = fold_beacon(beacon)
+            beacon_melting = melting_temperature(beacon)
+            beacon_tm_score = beacon_tm(beacon_melting)
             try:
                 # diseñar dichos primers
                 raw_output = primer3_design_columbo(region, pam_pos - start)
@@ -96,6 +105,8 @@ def main() -> None:
             print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
             print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
 
+            print(f" Diseño de Beacon: {GREEN}{beacon}{RESET} con Score {YELL}{beacon_score:.3f}{RESET}")
+            print(f" RNAfold hairping generado {GREEN}{beacon_struct}{RESET} y una Temperatura de melting {YELL}{beacon_melting:.2f}ºC{RESET} Score tm:{YELL}{beacon_tm_score}{RESET} ")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
