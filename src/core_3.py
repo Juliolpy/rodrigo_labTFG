@@ -60,7 +60,7 @@ def beacon_tm(tm: float, t_min:float=50.0, t_floor:float=45.0) -> float:
       1 si tm ≥ t_min
     """
     if tm < t_floor:
-        return 0.1
+        return 0.0
     if tm >= t_min:
         return 1.0
     return (tm - t_floor)/(t_min - t_floor)
@@ -83,7 +83,7 @@ def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=
     # 1. Estructura
     struct = fold_beacon(beacon_seq)
     if not hairpin_correct(struct):
-        return 1
+        return 0.0, 0.0, 0.0, 0.0
 
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
@@ -92,14 +92,15 @@ def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=
     # 3. Ratio beacon:nicada (simulación simple: fraction of complementarity)
     #    = número de nt complementarios / len(beacon)
     comp = sum(1 for a,b in zip(beacon_seq, seq_amplicon) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
-    R_bn = min(3, comp/len(beacon_seq))
+    R_bn = (comp/len(beacon_seq))
 
     # 4. Ratio gRNA libre = 1 - fraction complementary to beacon
     comp2 = sum(1 for a,b in zip(beacon_seq, gRNA_seq) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
-    R_gr = max(1, 3 - comp2/len(beacon_seq))
+    R_gr = 1.0 - comp2/len(beacon_seq)
 
     # Score global
-    return (R_bn * R_gr * F)**(1/3)
+    score = R_bn * R_gr * F
+    return score, R_bn, R_gr, F
 
 def design_beacon(protospacer: str,pam_seq: str = "NGG",stem_len:int=8,loop_len:int=6) -> str:
     """
@@ -108,13 +109,13 @@ def design_beacon(protospacer: str,pam_seq: str = "NGG",stem_len:int=8,loop_len:
     Deja el fluoróforo en 3' en primera posición del stem.
     """
     # definimos dominios arbitrarios: aquí s = complement(stem of protospacer[0:stem_len])
-    s = complement(protospacer[:stem_len])[::-1]
-    s_star = s[::-1].translate(str.maketrans("ATCG","TAGC"))
+    s_1 = complement(protospacer[:stem_len])[::-1]
+    s_2 = s_1[::-1].translate(str.maketrans("ATCG","TAGC"))
     # loop interno r* y t* elegimos secuencias neutrales (A/T rico)
-    r_star = "A"*loop_len
-    t_star = "T"*loop_len
+    r_1 = "A"*loop_len
+    t_2 = "T"*loop_len
     # beacon = 5'– s + r* + t* + s* –3'
-    beacon = s + r_star + t_star + s_star
+    beacon = s_1 + r_1 + t_2 + s_2
     return beacon
 
 def complement(seq:str)->str:

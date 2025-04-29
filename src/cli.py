@@ -55,10 +55,10 @@ def main() -> None:
             end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
             region = full_seq[start:end]
             # funcion beacon
-            prot = obj._protospacer
-            gRNA = prot + tracrRNA
-            beacon = design_beacon(str(prot))
-            beacon_score = score_beacon(beacon, str(prot), gRNA)
+            prot = str(obj._protospacer)
+            gRNA = str(prot) + tracrRNA
+            beacon = design_beacon(prot)
+            beacon_score, R_bn, R_gr, F_tm = score_beacon(beacon, prot, gRNA)
             beacon_struct = fold_beacon(beacon)
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
@@ -100,12 +100,13 @@ def main() -> None:
             print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
             print(f" Temperatura de melting (Tm): {YELL}{obj._tm:.2f}°C{RESET}")
             print(f" Scores individuales: {YELL}{obj._scores}{RESET}")
+            print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
 
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} :  ")
             print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
-            print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
-
-            print(f" Diseño de Beacon: {GREEN}{beacon}{RESET} con Score {YELL}{beacon_score:.3f}{RESET}")
+            print("                                                          ")
+            print(f" Diseño de Beacon: {GREEN}{beacon}{RESET} con Score {YELL}{beacon_score}{RESET}")
+            print(f" Score R_beacon: {YELL}{R_bn}{RESET}, Score R_guide: {YELL}{R_gr}{RESET} ")
             print(f" RNAfold hairping generado {GREEN}{beacon_struct}{RESET} y una Temperatura de melting {YELL}{beacon_melting:.2f}ºC{RESET} Score tm:{YELL}{beacon_tm_score}{RESET} ")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
