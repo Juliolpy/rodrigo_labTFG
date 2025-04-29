@@ -79,7 +79,7 @@ def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=
     (a falta de NUPACK real, aquí suponemos ideales si no hay
     motivos de homología extensiva), y F_tm.
     """
-    seq_amplicon = Seq(amplicon_seq).reverse_complement
+    seq_amplicon = Seq(amplicon_seq).reverse_complement()
     # 1. Estructura
     struct = fold_beacon(beacon_seq)
     if not hairpin_correct(struct):
@@ -99,7 +99,7 @@ def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=
     R_gr = max(1, 3 - comp2/len(beacon_seq))
 
     # Score global
-    return (R_bn * R_gr * F)^(1/3)
+    return (R_bn * R_gr * F)**(1/3)
 
 def design_beacon(protospacer: str,pam_seq: str = "NGG",stem_len:int=8,loop_len:int=6) -> str:
     """
