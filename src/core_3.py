@@ -1,0 +1,122 @@
+# TERCERA PARTE DEL SCRIPT CORE donde se diseña el Beacon con sus scores correspondientes
+
+# Importamos los módulos necesarios
+import subprocess
+from tempfile import NamedTemporaryFile
+from Bio.SeqUtils import MeltingTemp as mt
+from Bio import SeqIO
+from Bio.Seq import Seq
+import re
+# Función de folding
+def fold_beacon(seq: str ) -> str:
+    """
+    Función que recoge un str de ADN y lo convierte a ARN para poner usar RNAfold sobre el 
+
+    :param seq: secuencia de ADN
+    :type seq: str
+
+    :return: devuelve la structura que debe tener, simulando ARN
+    :rtype: str
+    
+    """
+    # RNAfold espera RNA, osea sustituimos Timinas por Uracilos
+    rna = seq.replace('T', 'U')
+    p = subprocess.Popen(
+        ["RNAfold", "--noPS"],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        text=True
+    )
+
+    out, error = p.communicate(rna+"\n") # nos da igual los errores
+    # salida: seq\nstructure ( score)\n
+    struct = out.splitlines()[1].split()[0] # no queremos la energia libre
+    return struct
+
+# vemos que el hairpin tiene efecticamente 8 nt en stem y 6 en el loop
+def hairpin_correct(struct: str, stem_len:int=8, loop_len:int=6) -> bool: # true or false
+    """
+    Función que comprueba en dot-bracket que hay un stem de al menos stem_len pares,
+    un loop de al menos loop_len puntos, y luego el stem inverso.
+    Buscamos el patrón: ^\( {stem,}\.{loop,}\){stem,}
+
+    :param struct: estructura generada por la función fold_beacon
+    :type struct: str
+    :param stem_len: longitud que tiene que tener la secuencia stem, 8 nt
+    :type stem_len: int
+    :param loop_len: longitud que debe tener la secuencia loop, 6 nt
+    :type loop_len: int
+
+    :return: un boleano
+    :rtype: bool
+    """
+    patron = r"^\({%d,}\.{%d,}\){%d,}" % (stem_len, loop_len, stem_len)
+    return re.match(patron, struct) is not None
+
+def beacon_tm(tm: float, t_min:float=50.0, t_floor:float=45.0) -> float:
+    """
+    Función de activación para Tm:
+      0 si tm < t_floor,
+      lineal de 0→1 entre t_floor→t_min,
+      1 si tm ≥ t_min
+    """
+    if tm < t_floor:
+        return 0.0
+    if tm >= t_min:
+        return 1.0
+    return (tm - t_floor)/(t_min - t_floor)
+
+def score_beacon(
+    beacon_seq: str,
+    amplicon_seq: str,
+    gRNA_seq: str,
+    tm_floor:float=50.0
+) -> float:
+    """
+    Calcula R_beacon:nicada y R_gRNA_libre de forma simplificada
+    (a falta de NUPACK real, aquí suponemos ideales si no hay
+    motivos de homología extensiva), y F_tm.
+    """
+    # 1. Estructura
+    struct = fold_beacon(beacon_seq)
+    if not hairpin_correct(struct):
+        return 0.0
+
+    # 2. Tm
+    tm_val = mt.Tm_NN(beacon_seq)
+    F = beacon_tm(tm_val, t_min=tm_floor)
+
+    # 3. Ratio beacon:nicada (simulación simple: fraction of complementarity)
+    #    = número de nt complementarios / len(beacon)
+    comp = sum(1 for a,b in zip(beacon_seq, amplicon_seq[::-1]) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
+    R_bn = min(1.0, comp/len(beacon_seq))
+
+    # 4. Ratio gRNA libre = 1 - fraction complementary to beacon
+    comp2 = sum(1 for a,b in zip(beacon_seq, gRNA_seq) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
+    R_gr = max(0.0, 1.0 - comp2/len(beacon_seq))
+
+    # Score global
+    return R_bn * R_gr * F
+
+def design_beacon(
+    protospacer: str,
+    pam_seq: str = "NGG",
+    stem_len:int=8,
+    loop_len:int=6
+) -> str:
+    """
+    Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
+    protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
+    Deja el fluoróforo en 3' en primera posición del stem.
+    """
+    # definimos dominios arbitrarios: aquí s = complement(stem of protospacer[0:stem_len])
+    s = complement(protospacer[:stem_len])[::-1]
+    s_star = s[::-1].translate(str.maketrans("ATCG","TAGC"))
+    # loop interno r* y t* elegimos secuencias neutrales (A/T rico)
+    r_star = "A"*loop_len
+    t_star = "T"*loop_len
+    # beacon = 5'– s + r* + t* + s* –3'
+    beacon = s + r_star + t_star + s_star
+    return beacon
+
+def complement(seq:str)->str:
+    return seq.translate(str.maketrans("ATCG","TAGC"))
