@@ -10,6 +10,15 @@ import pickle
 from Bio.Seq import Seq
 from Bio import SeqIO
 import re
+# colores para que uno se pueda aclarar
+RED = "\033[91m"
+CIAN = "\033[96m"
+GREEN = "\033[92m"
+GR = "\033[92m"
+RESET = "\033[0m"
+MAG = "\033[35m"
+YELL = "\033[33m"
+
 # crea una CLASE para hacer un RAISE para crear excepciones
 class Out_of_frame_ERROR(Exception):
    """
@@ -321,7 +330,7 @@ def process_genome(seq_name: dict, motifs: dict) -> list:
          if pos >= 20 and pos + 3 <= len(sequence):
             columbo_list.append(ColumboParts(sequence, pos)) # objeto seq y un int
          else:
-            print(f"[WARNING!!], posición {pos} descartada en {seq_id}:{Out_of_frame_ERROR}")
+            print(f"{RED} ⚠️ [WARNING]⚠️ {RESET} posición {YELL}{pos}{RESET} descartada en {CIAN}{seq_id}{RESET}:{RED}{Out_of_frame_ERROR}{RESET}")
    # ahora para quedarnos con los 20 mejores solo
    columbo_list.sort(key= lambda x : x.score_medio, reverse= True)
    return columbo_list[:20]
