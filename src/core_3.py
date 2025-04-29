@@ -60,26 +60,30 @@ def beacon_tm(tm: float, t_min:float=50.0, t_floor:float=45.0) -> float:
       1 si tm ≥ t_min
     """
     if tm < t_floor:
-        return 0.0
+        return 0.1
     if tm >= t_min:
         return 1.0
     return (tm - t_floor)/(t_min - t_floor)
 
-def score_beacon(
-    beacon_seq: str,
-    amplicon_seq: str,
-    gRNA_seq: str,
-    tm_floor:float=50.0
-) -> float:
+# para ver unicamente la tm
+def melting_temperature(seq: str) -> float:
+    """
+    Calcula la temperatura de melting (Tm) de una secuencia de DNA.
+    """
+    seq = seq.upper().replace("U", "T")  # Asegurar secuencia DNA válida
+    return float(mt.Tm_NN(seq))
+
+def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=50.0) -> float:
     """
     Calcula R_beacon:nicada y R_gRNA_libre de forma simplificada
     (a falta de NUPACK real, aquí suponemos ideales si no hay
     motivos de homología extensiva), y F_tm.
     """
+    seq_amplicon = Seq(amplicon_seq).reverse_complement
     # 1. Estructura
     struct = fold_beacon(beacon_seq)
     if not hairpin_correct(struct):
-        return 0.0
+        return 1
 
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
@@ -87,22 +91,17 @@ def score_beacon(
 
     # 3. Ratio beacon:nicada (simulación simple: fraction of complementarity)
     #    = número de nt complementarios / len(beacon)
-    comp = sum(1 for a,b in zip(beacon_seq, amplicon_seq[::-1]) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
-    R_bn = min(1.0, comp/len(beacon_seq))
+    comp = sum(1 for a,b in zip(beacon_seq, seq_amplicon) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
+    R_bn = min(3, comp/len(beacon_seq))
 
     # 4. Ratio gRNA libre = 1 - fraction complementary to beacon
     comp2 = sum(1 for a,b in zip(beacon_seq, gRNA_seq) if (a=="A" and b=="T") or (a=="T" and b=="A") or (a=="C" and b=="G") or (a=="G" and b=="C"))
-    R_gr = max(0.0, 1.0 - comp2/len(beacon_seq))
+    R_gr = max(1, 3 - comp2/len(beacon_seq))
 
     # Score global
-    return R_bn * R_gr * F
+    return (R_bn * R_gr * F)^(1/3)
 
-def design_beacon(
-    protospacer: str,
-    pam_seq: str = "NGG",
-    stem_len:int=8,
-    loop_len:int=6
-) -> str:
+def design_beacon(protospacer: str,pam_seq: str = "NGG",stem_len:int=8,loop_len:int=6) -> str:
     """
     Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
     protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
