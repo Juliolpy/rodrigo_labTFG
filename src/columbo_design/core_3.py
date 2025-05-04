@@ -1,8 +1,6 @@
 # TERCERA PARTE DEL SCRIPT CORE donde se diseña el Beacon con sus scores correspondientes
 
 # Importamos los módulos necesarios
-import subprocess
-from tempfile import NamedTemporaryFile
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio import SeqIO
 from Bio.Seq import Seq

@@ -1,5 +1,4 @@
 from Bio import SeqIO
-from Bio.Seq import Seq
 import sys
 
 fasta_file = sys.argv[1]
