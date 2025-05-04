@@ -1,6 +1,6 @@
 import pytest
 import subprocess
-from src.core import read_fasta
+from columbo_design.core import read_fasta
 from pathlib import Path
 
 # vamos a crear un test para ver que nuestro script funciona

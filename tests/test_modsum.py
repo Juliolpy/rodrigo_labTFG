@@ -1,5 +1,7 @@
-from src.modsum import modsum
+from columbo_design.modsum import modsum
 
+import sys
+print(sys.path)
 
 def test_mod2() -> None:
     """
