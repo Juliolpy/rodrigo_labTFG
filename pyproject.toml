@@ -1,10 +1,10 @@
 [project]
-name = "rodrigo-labtfg"
+name = "columbo-design"
 version = "0.1.0"
-description = "Programa para el diseño de secuencias"
+description = "Program for designing genetic parts for the COLUMBO diagnostic system"
 authors = [
-    {name = "luksgrin",email = "lugoibel@doctor.upv.es"},
     {name = "Julio",email = "jcochenta@gmail.com"}
+    {name = "luksgrin",email = "lucas.goiriz@csic.es"},
 ]
 license = {text = "MIT"}
 readme = "README.md"
