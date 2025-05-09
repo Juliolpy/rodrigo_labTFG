@@ -13,5 +13,5 @@ def test_vienna_RNA():
 
     assert resultado["Secuencia"] == "AUGCGCGGCGCACACGAGCAU"
     assert resultado["secondary_structure"] == "((((.((.......)).))))"
-    assert resultado["min_energy"] == -5.10 
+    assert resultado["min_energy"] == -5.10 # tiene que se run float, que antes lo habia puesto como string
     assert len(resultado["secondary_structure"]) == len(test_seq)

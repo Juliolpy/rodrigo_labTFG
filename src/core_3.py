@@ -70,7 +70,7 @@ def melting_temperature(seq: str) -> float:
     """
     Calcula la temperatura de melting (Tm) de una secuencia de DNA.
     """
-    seq = seq.upper().replace("U", "T")  # Asegurar secuencia DNA válida
+    seq = seq.upper().replace("U", "T")  # Asegurar secuencia RNA válida
     return float(mt.Tm_NN(seq))
 
 def score_beacon(beacon_seq: str,amplicon_seq: str,gRNA_seq: str,tm_floor:float=50.0) -> float:

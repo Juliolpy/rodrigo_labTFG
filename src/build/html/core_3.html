@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>core_3 module &#8212; documentación de Rodrigo_lab - 0.1</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=9c9b61ad"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-core_3">
+<span id="core-3-module"></span><h1>core_3 module<a class="headerlink" href="#module-core_3" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.fold_beacon">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">fold_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/core_3.html#fold_beacon"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.fold_beacon" title="Link to this definition">¶</a></dt>
+<dd><p>Función que recoge un str de ADN y lo convierte a ARN para poner usar RNAfold sobre el</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – secuencia de ADN</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>devuelve la structura que debe tener, simulando ARN</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.hairpin_correct">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">hairpin_correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stem_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/core_3.html#hairpin_correct"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.hairpin_correct" title="Link to this definition">¶</a></dt>
+<dd><p>Función que comprueba en dot-bracket que hay un stem de al menos stem_len pares,
+un loop de al menos loop_len puntos, y luego el stem inverso.
+Buscamos el patrón: ^( {stem,}.{loop,}){stem,}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> (<em>str</em>) – estructura generada por la función fold_beacon</p></li>
+<li><p><strong>stem_len</strong> (<em>int</em>) – longitud que tiene que tener la secuencia stem, 8 nt</p></li>
+<li><p><strong>loop_len</strong> (<em>int</em>) – longitud que debe tener la secuencia loop, 6 nt</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>un boleano</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.beacon_tm">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">beacon_tm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">45.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/core_3.html#beacon_tm"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.beacon_tm" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Función de activación para Tm:</dt><dd><p>0 si tm &lt; t_floor,
+lineal de 0→1 entre t_floor→t_min,
+1 si tm ≥ t_min</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.melting_temperature">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">melting_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/core_3.html#melting_temperature"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.melting_temperature" title="Link to this definition">¶</a></dt>
+<dd><p>Calcula la temperatura de melting (Tm) de una secuencia de DNA.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.score_beacon">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">score_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beacon_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplicon_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gRNA_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/core_3.html#score_beacon"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.score_beacon" title="Link to this definition">¶</a></dt>
+<dd><p>Calcula R_beacon:nicada y R_gRNA_libre de forma simplificada
+(a falta de NUPACK real, aquí suponemos ideales si no hay
+motivos de homología extensiva), y F_tm.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.design_beacon">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">design_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protospacer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'NGG'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stem_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/core_3.html#design_beacon"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.design_beacon" title="Link to this definition">¶</a></dt>
+<dd><p>Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
+protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
+Deja el fluoróforo en 3” en primera posición del stem.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="core_3.complement">
+<span class="sig-prename descclassname"><span class="pre">core_3.</span></span><span class="sig-name descname"><span class="pre">complement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/core_3.html#complement"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#core_3.complement" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Rodrigo_lab</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Julio.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/core_3.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -106,8 +106,8 @@ def main() -> None:
 
     # los cargamos y leemos ambos ya que ambas funciones reciben un str, no un diccionario
     loaded_json = read_json("data.json")
-    print(f"Datos de archivo json: {loaded_json}")
-
+    print(f"Datos de archivo json: {loaded_json}") # json no puede guardar objetos directamente, tienen que ser convertidos a diccionarios
+                                                    # tampoco puede guardar funciones 
     loaded_pickle = read_pickle("data.pkl")
     print(f"Datos del archivo pickle: {loaded_pickle}")
 

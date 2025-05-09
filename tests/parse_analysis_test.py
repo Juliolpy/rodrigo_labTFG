@@ -2,6 +2,7 @@ import pytest
 import subprocess
 from src.core import read_fasta
 from pathlib import Path
+from src.core import ColumboParts, find_NGG_motivs, process_genome
 
 # vamos a crear un test para ver que nuestro script funciona
 # para ello creamos un fasta ficticio
@@ -40,7 +41,7 @@ def test_read_fasta(tmp_path):
         """
         Vemos que parse_analysis.py se ejecuta como debe y devuelve salida
         Para ello creamos el mismo fasta ficticio que en la funcion test_read_fasta
-
+        con el módulo subprocess podemos importar todo el script como si estuvieramos ejecutandolo desde la terminal
 
         !! La secuencia que se muestra en fasta_content tiene todos los sitios de restriccion
         de todas las enzimas

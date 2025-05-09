@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>core_2 &#8212; documentación de Rodrigo_lab - 0.1</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=9c9b61ad"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Código fuente para core_2</h1><div class="highlight"><pre>
+<span></span><span class="c1"># PARTE 2 del core.py para una mayor organización, no tener todo amontonado en un solo script</span>
+<span class="c1"># Contiene las FUNCIONES para el diseño de primers, ... </span>
+
+<span class="c1"># importamos el módulo subprocess para lanzar programas externos dentro de nuestro script</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.Seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio</span><span class="w"> </span><span class="kn">import</span> <span class="n">SeqIO</span>
+<span class="c1"># Para que primer3 pueda trabajar necesita un tipo de archivo especial</span>
+<div class="viewcode-block" id="primer3_design_columbo">
+<a class="viewcode-back" href="../core_2.html#core_2.primer3_design_columbo">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">primer3_design_columbo</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pam_position</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Función que utiliza programa primer3  invocado con subprocess para diseñar primers, toma como input: una secuencia y la posicion del pam</span>
+
+<span class="sd">   :param sequence: secuencia a pasar a primer3</span>
+<span class="sd">   :type sequence: str</span>
+
+<span class="sd">   :return: diseño de primers Forward y Reverse para las regiones upstream y downstream del protospacer</span>
+<span class="sd">   :rtype: str</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="c1"># todo en mayúsculas</span>
+   <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+   <span class="c1"># limpiamos secuencia, eliminamos cualquier cosa que no sea A, T, C o G</span>
+   <span class="n">sequence</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^ATCG]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">sequence</span><span class="p">)</span> 
+   <span class="c1"># Creamos el contenido con formato válido</span>
+   <span class="n">primer3_input</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;SEQUENCE_ID=test</span>
+<span class="s2">SEQUENCE_TEMPLATE=</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span>
+<span class="s2">SEQUENCE_TARGET=</span><span class="si">{</span><span class="n">pam_position</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">20</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="mi">23</span><span class="si">}</span>
+<span class="s2">PRIMER_PRODUCT_SIZE_RANGE=65-165</span>
+<span class="s2">PRIMER_TASK=generic</span>
+<span class="s2">PRIMER_MIN_SIZE=18</span>
+<span class="s2">PRIMER_MAX_SIZE=22</span>
+<span class="s2">PRIMER_NUM_RETURN=5</span>
+<span class="s2">=</span>
+<span class="s2">&quot;&quot;&quot;</span>
+   
+   <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;entry.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">primer3_input</span><span class="p">)</span>
+
+   <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+      <span class="p">[</span><span class="s2">&quot;primer3_core&quot;</span><span class="p">,</span> <span class="s2">&quot;entry.txt&quot;</span><span class="p">],</span> <span class="c1"># le damos como input el fasta (str)</span>
+      <span class="n">stdout</span><span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+      <span class="n">stderr</span><span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+   <span class="p">)</span>
+   <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+   <span class="c1"># si no devuelve nada</span>
+   <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># si devuelve algo que no sea 0</span>
+      <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;❌ Error al ejecutar primer3_core:</span><span class="se">\n</span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+   <span class="c1"># si primer3_core nos devuelve texto plano, la devolvemos como str</span>
+   <span class="n">output</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+   <span class="c1"># procesamos dicho str y lo convertimos en un diccionario</span>
+
+   <span class="k">return</span> <span class="n">output</span></div>
+
+
+<span class="c1"># ------ df∈[27,42], dr∈[15,100] -------</span>
+   <span class="c1"># min = distancia mínima de forward al PAM + tamaño del protospacer + 3 (longitud PAM) + distancia mínima de reverse al PAM</span>
+   <span class="c1"># max = distancia máxima de forward al PAM + tamaño del protospacer + 3 + distancia máxima de reverse al PAM</span>
+   <span class="c1"># protospacer+PAM ocupa 23 nt, y quieres df∈[27,42], dr∈[15,100], entonces:</span>
+   <span class="c1"># PRIMER_PRODUCT_SIZE_RANGE= (27 + 23 + 15, 42 + 23 + 100) = (65, 165)</span>
+
+<div class="viewcode-block" id="score_primers">
+<a class="viewcode-back" href="../core_2.html#core_2.score_primers">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_primers</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pam_pos</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">protospacer_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Función que evalua la bondad de los primers y las posiciones en las que tienen que unirse</span>
+<span class="sd">   Dado el dict parseado de Primer3 y la posición del PAM, devuelve un score 0 - 1 combinando:</span>
+
+<span class="sd">      - Cumplimiento de distancias</span>
+
+<span class="sd">      - Contenido GC (~50 %)</span>
+
+<span class="sd">      - Tm (proporcionado por Primer3)</span>
+
+<span class="sd">   :param output: dict con los primers que saca primer3</span>
+<span class="sd">   :type output: dict</span>
+<span class="sd">   :param pam_pos: posicion de las PAM evaluadas por Columbo</span>
+<span class="sd">   :type pam_pos: int</span>
+<span class="sd">   :param protospacer_len: longitud del protospacer + PAM (23 nt)</span>
+<span class="sd">   :type protospacer_len: int</span>
+
+<span class="sd">   :return: score de primers</span>
+<span class="sd">   :rtype: float</span>
+<span class="sd">   </span>
+<span class="sd">   output:</span>
+<span class="sd">   - &#39;PRIMER_LEFT_0&#39;: (start, length)</span>
+<span class="sd">   - &#39;PRIMER_RIGHT_0&#39;: (start, length)</span>
+<span class="sd">   - &#39;PRIMER_LEFT_0_TM&#39;, &#39;PRIMER_RIGHT_0_TM&#39;</span>
+<span class="sd">   - &#39;PRIMER_LEFT_0_GC_PERCENT&#39;, &#39;PRIMER_RIGHT_0_GC_PERCENT&#39;</span>
+<span class="sd">   pam_pos = índice 0-based donde empieza el PAM en la secuencia.</span>
+<span class="sd">   protospacer_len = longitud de protospacer+PAM (por defecto 23).</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="c1"># posiciones</span>
+   <span class="n">left_start</span><span class="p">,</span> <span class="n">left_len</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;PRIMER_LEFT_0&quot;</span><span class="p">]</span>
+   <span class="n">right_start</span><span class="p">,</span> <span class="n">right_len</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0&quot;</span><span class="p">]</span>
+   <span class="c1"># (1) calculamos distacias </span>
+   <span class="n">df</span> <span class="o">=</span> <span class="n">pam_pos</span> <span class="o">-</span> <span class="n">left_start</span>
+   <span class="n">dr</span> <span class="o">=</span> <span class="p">(</span><span class="n">right_start</span> <span class="o">+</span> <span class="n">right_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">pam_pos</span> <span class="o">+</span> <span class="n">protospacer_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+   <span class="c1"># (2) puntuación por distancia (1 si esta en el rango y 0 si no)</span>
+   <span class="n">s_df</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="mi">27</span> <span class="o">&lt;=</span> <span class="n">df</span> <span class="o">&lt;=</span> <span class="mi">42</span> <span class="k">else</span> <span class="mf">0.0</span>
+   <span class="n">s_dr</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="mi">15</span> <span class="o">&lt;=</span> <span class="n">dr</span> <span class="o">&lt;=</span> <span class="mi">100</span> <span class="k">else</span> <span class="mf">0.0</span>
+   <span class="c1"># (3) puntuación por contenido GC (máx -&gt;50 %), la da el programa primer3</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">gc_score</span><span class="p">(</span><span class="n">gc_percent</span><span class="p">):</span>
+      <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gc_percent</span> <span class="o">-</span> <span class="mi">50</span><span class="p">)</span><span class="o">/</span><span class="mi">50</span> <span class="c1"># 1.0 si gc = 50, decae linealmente</span>
+   <span class="n">s_gc</span> <span class="o">=</span> <span class="p">((</span><span class="n">gc_score</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;PRIMER_LEFT_0_GC_PERCENT&#39;</span><span class="p">]))</span> <span class="o">+</span> <span class="p">(</span><span class="n">gc_score</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0_GC_PERCENT&quot;</span><span class="p">])))</span> <span class="o">/</span> <span class="mi">2</span>
+   <span class="c1"># (4) puntuación por la tm, la da el programa -&gt; ideal 58 - 62 ºC</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">tm_score</span><span class="p">(</span><span class="n">tm</span><span class="p">):</span>
+      <span class="k">if</span> <span class="mi">58</span> <span class="o">&lt;=</span> <span class="n">tm</span> <span class="o">&lt;=</span> <span class="mi">62</span><span class="p">:</span>
+         <span class="k">return</span> <span class="mf">1.0</span>
+      <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">tm</span><span class="o">-</span><span class="mi">60</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># 60 al ser la media entre 58 y 62, entre 10 para escalarlo entre 0 y 1 y que no pase de 1. Funciones anidadas</span>
+   <span class="n">s_tm</span> <span class="o">=</span> <span class="p">(</span> <span class="n">tm_score</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;PRIMER_LEFT_0_TM&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">tm_score</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;PRIMER_RIGHT_0_TM&#39;</span><span class="p">])</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+   <span class="c1"># score global, dandole más importancia a la distancia</span>
+   <span class="n">score_global</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_df</span> <span class="o">*</span> <span class="n">s_dr</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">s_gc</span> <span class="o">+</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">s_tm</span>
+   <span class="k">return</span> <span class="n">score_global</span> <span class="c1"># a la funcion score_primers</span></div>
+
+
+
+
+<span class="c1"># funcion parser para gestionar las salidas del programa primer3</span>
+<div class="viewcode-block" id="parse_primers_output">
+<a class="viewcode-back" href="../core_2.html#core_2.parse_primers_output">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_primers_output</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">template_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Función que recoge los datos del archivo generado por primer3 y genera un diccionario rápidamente legible</span>
+
+<span class="sd">   :param output: output del programa primer3</span>
+<span class="sd">   :type output: str</span>
+
+<span class="sd">   :return: dict con los primers forward y reverse</span>
+<span class="sd">   :rtype: dict</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+   <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_LEFT_0=&quot;</span><span class="p">):</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+            <span class="n">primer_seq</span> <span class="o">=</span> <span class="n">template_sequence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_LEFT_0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_LEFT_0_sequence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">primer_seq</span>
+            
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_RIGHT_0=&quot;</span><span class="p">):</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">coords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">))</span>
+            <span class="n">primer_seq</span> <span class="o">=</span> <span class="n">template_sequence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span>
+            <span class="n">primer_seq</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">primer_seq</span><span class="p">)</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">())</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0_sequence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">primer_seq</span>
+
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_LEFT_0_TM=&quot;</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_LEFT_0_TM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_RIGHT_0_TM=&quot;</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0_TM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_LEFT_0_GC_PERCENT=&quot;</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_LEFT_0_GC_PERCENT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;PRIMER_RIGHT_0_GC_PERCENT=&quot;</span><span class="p">):</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;PRIMER_RIGHT_0_GC_PERCENT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+   <span class="k">return</span> <span class="n">results</span></div>
+
+
+<span class="c1"># pasar los archivos generados del programa a json</span>
+<div class="viewcode-block" id="output_pimers_json">
+<a class="viewcode-back" href="../core_2.html#core_2.output_pimers_json">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">output_pimers_json</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>  <span class="c1">#JSON</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Devuelve un archivo json con los objetos creados por primer3_design</span>
+
+<span class="sd">      :param output: output del programa primer3</span>
+<span class="sd">      :type: str</span>
+
+<span class="sd">      :return: Diccionario en formato .json</span>
+<span class="sd">      :rtype: dict</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+   <span class="c1"># guardamos los datos en json en file</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_PRIMERS.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+      <span class="c1"># los leemos y cargamos</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_PRIMERS.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span> <span class="c1"># los cargamos, no hace falta return </span>
+         <span class="n">json_primers</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">json_primers</span></div>
+
+
+<span class="c1"># pasar los archivos generados del programa a pickle</span>
+<div class="viewcode-block" id="output_primers_pickle">
+<a class="viewcode-back" href="../core_2.html#core_2.output_primers_pickle">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">output_primers_pickle</span><span class="p">(</span><span class="n">output</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>    <span class="c1"># PICKLE</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Devuelve un archivo pickle con los objetos creados por primer3_design</span>
+<span class="sd">      </span>
+<span class="sd">      :param output: output del programa primer3</span>
+<span class="sd">      :type: str</span>
+
+<span class="sd">      :return: Diccionario en formato .pickle</span>
+<span class="sd">      :rtype: dict</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+
+    <span class="c1"># guardamos los datos en pickle en file</span>
+   <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_PRIMERS.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+   <span class="c1"># los leemos y cargamos</span>
+   <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_PRIMERS.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">pickle_primers</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">pickle_primers</span></div>
+
+   
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Rodrigo_lab</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navegación</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Código de módulo</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Julio.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

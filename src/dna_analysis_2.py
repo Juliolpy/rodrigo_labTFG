@@ -1,6 +1,6 @@
 import re
 
-def search_restriction_sites(sequence: str, enzyme_name: str) -> list: # para no poder modificar los valores que nos devuelva
+def search_restriction_sites(sequence: str, enzyme_name: str) -> list: # devuelve una lista
     """
     Busca los sitios de corte de una enzima de restricción específica en una secuencia de ADN.
     
