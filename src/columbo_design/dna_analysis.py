@@ -1,5 +1,4 @@
 import re
-import sys
 
 sequence = input(str("introduce la secuecia de interés para encontrar sitios de restriccion BamHI, Recuerda que es  < 'GGATCC'> : "))
 

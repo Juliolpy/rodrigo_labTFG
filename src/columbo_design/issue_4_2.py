@@ -23,10 +23,12 @@ def vienna_RNA(RNA_seq: str) -> dict:
         "min_energy": mfe
     }
 
-seq = sys.argv[1]  # Obtenemos la secuencia de ARN desde la terminal
-resultado = vienna_RNA(seq)
+if __name__ == "__main__":
 
-# Imprimimos el resultado
-print(f"Secuencia: {seq}")
-print(f"Estructura secundaria: {resultado['secondary_structure']}")
-print(f"Energía mínima: {resultado['min_energy']:.2f} kcal/mol")
+    seq = sys.argv[1]  # Obtenemos la secuencia de ARN desde la terminal
+    resultado = vienna_RNA(seq)
+
+    # Imprimimos el resultado
+    print(f"Secuencia: {seq}")
+    print(f"Estructura secundaria: {resultado['secondary_structure']}")
+    print(f"Energía mínima: {resultado['min_energy']:.2f} kcal/mol")

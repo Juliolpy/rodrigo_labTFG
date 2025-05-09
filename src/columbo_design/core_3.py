@@ -1,36 +1,28 @@
 # TERCERA PARTE DEL SCRIPT CORE donde se diseña el Beacon con sus scores correspondientes
 
 # Importamos los módulos necesarios
-import subprocess
-from tempfile import NamedTemporaryFile
 from Bio.SeqUtils import MeltingTemp as mt
 from Bio import SeqIO
 from Bio.Seq import Seq
 import re
+import RNA  # Make sure this import is at the top of your file
+
 # Función de folding
-def fold_beacon(seq: str ) -> str:
+def fold_beacon(seq: str) -> str:
     """
-    Función que recoge un str de ADN y lo convierte a ARN para poner usar RNAfold sobre el 
+    Función que recoge un str de ADN y lo convierte a ARN para poder usar ViennaRNA sobre él.
 
     :param seq: secuencia de ADN
     :type seq: str
 
-    :return: devuelve la structura que debe tener, simulando ARN
+    :return: devuelve la estructura secundaria en notación de paréntesis (dot-bracket)
     :rtype: str
-    
     """
-    # RNAfold espera RNA, osea sustituimos Timinas por Uracilos
+    # Convert DNA to RNA (replace T with U)
     rna = seq.replace('T', 'U')
-    p = subprocess.Popen(
-        ["RNAfold", "--noPS"],
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-        text=True
-    )
-
-    out, error = p.communicate(rna+"\n") # nos da igual los errores
-    # salida: seq\nstructure ( score)\n
-    struct = out.splitlines()[1].split()[0] # no queremos la energia libre
-    return struct
+    # Use ViennaRNA to fold the RNA sequence
+    structure, _ = RNA.fold(rna)
+    return structure
 
 # vemos que el hairpin tiene efecticamente 8 nt en stem y 6 en el loop
 def hairpin_correct(struct: str, stem_len:int=8, loop_len:int=6) -> bool: # true or false

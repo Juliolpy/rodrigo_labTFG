@@ -5,9 +5,9 @@
 # para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.
 import argparse
 # importamos las funciones del codigo
-from core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
-from core_2 import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
-from core_3 import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature
+from .core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
+from .core_2 import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
+from .core_3 import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -65,13 +65,18 @@ def main() -> None:
             try:
                 # diseñar dichos primers
                 raw_output = primer3_design_columbo(region, pam_pos - start)
-                parsed_primers = parse_primers_output(raw_output, region)
-                score = score_primers(parsed_primers, pam_pos-start, protospacer_len=23)
-                primers_for_obj[pam_pos] = {
-                    "primers": parsed_primers,
-                    "score": round(score, 2)
-                }
+                try:
+                    parsed_primers = parse_primers_output(raw_output, region)
+                    score = score_primers(raw_output, pam_pos-start, protospacer_len=23)
+                    primers_for_obj[pam_pos] = {
+                        "primers": parsed_primers,
+                        "score": round(score, 2)
+                    }
+                except ValueError as exc:
+                    # Handle the case where no primers are found for this region
+                    primers_for_obj[pam_pos] = {"error": str(exc)}
             except Exception as exc:
+                # Handle other errors in primer design
                 primers_for_obj[pam_pos] = {"error": str(exc)}
     # especificamos el archivo que queremos
     if args.output == "pickle":
@@ -111,6 +116,7 @@ def main() -> None:
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
+                print(f" Score de primer: {YELL}{0}{RESET}")
             else:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
                 print(f" Score de primer: {YELL}{primer_data['score']:.2f}{RESET}")

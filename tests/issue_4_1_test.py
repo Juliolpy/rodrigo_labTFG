@@ -1,5 +1,5 @@
 import pytest
-from src.issue_4_1 import issue_4_1
+from columbo_design.issue_4_1 import analyze_fasta
 
 # definimos la función y creamos un archivo fasta para ver como funciona el script del Issue_4.1
 

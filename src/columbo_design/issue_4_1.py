@@ -1,5 +1,4 @@
 from Bio import SeqIO
-from Bio.Seq import Seq
 
 def analyze_fasta(fasta_file: str) -> dict:
     """
