@@ -124,7 +124,7 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str, tm_floor:floa
     return score, R_bn, R_gr, F
 
 
-def design_beacon(protospacer: str, stem_len:int=8, loop_len:int=3) -> str:
+def design_beacon(protospacer: str, stem_len:int=8, loop_len:int=6) -> str:
     """
     Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
     protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
@@ -134,10 +134,9 @@ def design_beacon(protospacer: str, stem_len:int=8, loop_len:int=3) -> str:
     s_1 = complement(protospacer[:stem_len])[::-1]
     s_2 = s_1[::-1].translate(str.maketrans("ATCG","TAGC"))
     # loop interno r* y t* elegimos secuencias neutrales (A/T rico)
-    r_1 = "A"*loop_len
-    r_2 = "A"*loop_len
-    # beacon = 5'– s + r* + t* + s* –3'
-    beacon = s_1 + r_1 + r_2 + s_2
+    l = "A"*loop_len
+    # beacon = 5'– s + l + s* –3'
+    beacon = s_1 + l + s_2
     return beacon
 
 def complement(seq:str)->str:
