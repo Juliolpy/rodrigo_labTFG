@@ -42,13 +42,14 @@ def hairpin_correct(struct: str, stem_len=8 , loop_len:int=6) -> bool: # true or
     :rtype: bool
     """
     # patron = r"^\({%d,}\.{%d,}\){%d,}" % (stem_len, loop_len, stem_len)
+    # redex desglosado:
     # parentesis ( desde el incio del primer stem_len
     left = len(re.match(r'^\(+', struct).group(0)) if re.match(r'^\(+', struct) else 0
     # puntos del loop_len
     middle = len(re.match(r'^\.+', struct[left:-1:]).group(0)) if re.match(r'^\.+', struct[left:-1:]) else 0
     # parentesis de la derecha, stem_len final
     right = len(re.match(r'\)+', struct[::-1]).group(0)) if re.match(r'\)+', struct[::-1]) else 0
-    return left >= stem_len and right >= stem_len and middle >= loop_len
+    return left >= stem_len and right >= stem_len and middle >= loop_len # True si al menos len de parentesis y puntos (stem_len, loop_len)
     
 def beacon_tm(tm: float, t_min:float=50.0, t_floor:float=45.0) -> float:
     """
