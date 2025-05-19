@@ -708,6 +708,36 @@ sftp = ["paramiko (>=2.7.0)"]
 xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
+name = "primer3-py"
+version = "2.1.0"
+description = "Python bindings for Primer3"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "primer3_py-2.1.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:90787403859bf5b4554dd9fade89ae0d8424347d5dca020c3c3871a363019d4a"},
+    {file = "primer3_py-2.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:454eee028f3885adf5dd95fb679102f32e6cd1a54a06b5e4f7fe8dfc61786d30"},
+    {file = "primer3_py-2.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:724fb2b932378dbd4e65be5c1d2391592fe2cb588f894f3d448b7d6358f35d14"},
+    {file = "primer3_py-2.1.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:7660b7588173ef024f0c9d033bb0b6cf5e70e5237964536d946b78bc12a4ebed"},
+    {file = "primer3_py-2.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a6e4f380e8c14b599963e625d6a35c72bb725e9fb613803591585e6ad7d843af"},
+    {file = "primer3_py-2.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:1bfe6c3e76c8678102473a47664809693bd9cfec03ddd00ae446f90080cefbff"},
+    {file = "primer3_py-2.1.0-cp312-cp312-macosx_10_14_x86_64.whl", hash = "sha256:223f8b4bc70dac52cea332aedb2b6313c5761fec6d4d34131c66768d98d97c4f"},
+    {file = "primer3_py-2.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ea201c1ff6b9d392f3abd171479059de737a8d8493973800fad819103050ceba"},
+    {file = "primer3_py-2.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:c082c6e630eeec141eaa856331852a2bbdf94b6c0d8068bc4f4e8cc9a1b28b9f"},
+    {file = "primer3_py-2.1.0-cp313-cp313-macosx_10_14_x86_64.whl", hash = "sha256:b6ba30e9d4551a9dad71ea243d1694ff49aa2639a0ccb4a01277b89dc1789197"},
+    {file = "primer3_py-2.1.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2261085bd6059af833b276a1d7272e45dddf655fb9076931ed7d54299e92c663"},
+    {file = "primer3_py-2.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:532df04a26d6281a21443d04ed6785e4ba97d4897aae3259c6620d70e95e4418"},
+    {file = "primer3_py-2.1.0-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:6cdac76acc678b01f7885deb0fdf0cdbae2750a69d30953de694375e6c64928d"},
+    {file = "primer3_py-2.1.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e65ed25810c384e7d7ccbd41ad50bc11d5964ec4f5874c5fe1a76608e4be21e0"},
+    {file = "primer3_py-2.1.0-cp38-cp38-win_amd64.whl", hash = "sha256:ab7ed7bb793b35aa15e9753efafb3f81739d5726db4fad21858ee8889f13ae0d"},
+    {file = "primer3_py-2.1.0-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:77cf6df4bd52f59c97a39d95654935c1db3646e00ee09ee3430201a0292232b4"},
+    {file = "primer3_py-2.1.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:b1c74cd4731b55cf24a3140786dad0e26c80212d866596dfa7a1ac95fd9c7f7f"},
+    {file = "primer3_py-2.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:da9e8069b22b9b1ef0c22b97e0f1bf7df0ba4c440b84a2a5e24866501f04955c"},
+    {file = "primer3_py-2.1.0-cp39-cp39-win_amd64.whl", hash = "sha256:e63e58c266bd6cd77c4b67dd63967497e4947a973c4162013b7b96b92713edb5"},
+    {file = "primer3_py-2.1.0.tar.gz", hash = "sha256:bc21e932508e7419411463dde9be2095419a74170659e86738ac2d692bffbbeb"},
+]
+
+[[package]]
 name = "pygments"
 version = "2.19.1"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -1094,4 +1124,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "c6e58133a0e5ee529201f6a9ab30e11df590d400a617e58fde834d462f72971f"
+content-hash = "a81ca880a427c71e75239d692bd2965cd25ea9d38d3f063db4e900dbcf2bb59e"

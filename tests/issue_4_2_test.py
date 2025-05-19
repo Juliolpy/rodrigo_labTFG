@@ -1,5 +1,5 @@
 import pytest
-from src.issue_4_2 import issue_4_2
+from columbo_design.issue_4_2 import vienna_RNA
 import RNA
 
 # definimos la función ya que vamos a probar si funciona en una secuencia que creemos

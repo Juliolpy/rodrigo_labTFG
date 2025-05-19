@@ -1,22 +1,28 @@
-[project]
-name = "rodrigo-labtfg"
+[tool.poetry]
+name = "columbo-design"
 version = "0.1.0"
-description = "Programa para el diseño de secuencias"
+description = "Program for designing genetic parts for the COLUMBO diagnostic system"
 authors = [
-    {name = "luksgrin",email = "lugoibel@doctor.upv.es"},
-    {name = "Julio",email = "jcochenta@gmail.com"}
+    "Julio <jcochenta@gmail.com>",
+    "luksgrin <lucas.goiriz@csic.es>"
 ]
-license = {text = "MIT"}
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "bio (>=1.7.1,<2.0.0)",
-    "viennarna (>=2.7.0,<3.0.0)",
-    "pytest (>=8.3.5,<9.0.0)",
-    "sphinx (>=8.2.3,<9.0.0)"
+packages = [
+    { include = "columbo_design", from = "src" }
 ]
 
+[tool.poetry.dependencies]
+python = ">=3.12"
+bio = ">=1.7.1,<2.0.0"
+viennarna = ">=2.7.0,<3.0.0"
+pytest = ">=8.3.5,<9.0.0"
+sphinx = ">=8.2.3,<9.0.0"
+primer3-py = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+columbo-cli = "columbo_design.cli:main"

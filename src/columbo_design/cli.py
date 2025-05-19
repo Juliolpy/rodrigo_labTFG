@@ -1,13 +1,14 @@
-# entrypoint file
+# Entrypoint file
 # añadimos parser que le de al usuario la facilidad de pasar un path al fichero fasta
 
 # El fichero cli.py debe importar las funciones de core.py y darle los argumentos adecuados a las mismas
 # para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.
 import argparse
+from Bio.Seq import Seq
 # importamos las funciones del codigo
-from core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
-from core_2 import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
-from core_3 import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature
+from .core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
+from .primer_design import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
+from .beacon import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -43,6 +44,7 @@ def main() -> None:
     NGG_positions = find_NGG_motivs(sequences)
     top_candidates = process_genome(sequences, NGG_positions) # vemos cuales son los resultados de la clase y los almacenamos en la variable top_candidates
 
+    beacons_for_obj = {}
     primers_for_obj = {}
     for seq_id, seq in sequences.items():
         for obj in top_candidates:
@@ -55,23 +57,37 @@ def main() -> None:
             end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
             region = full_seq[start:end]
             # funcion beacon
-            prot = str(obj._protospacer)
-            gRNA = str(prot) + tracrRNA
-            beacon = design_beacon(prot)
-            beacon_score, R_bn, R_gr, F_tm = score_beacon(beacon, prot, gRNA)
+            gRNA = str(obj._protospacer) + tracrRNA
+            beacon = design_beacon(obj._protospacer)
             beacon_struct = fold_beacon(beacon)
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
+            beacon_score, R_bn, R_gr, F_tm = score_beacon(beacon, obj._protospacer, gRNA)
+            beacons_for_obj[obj._position] = {
+            "beacon":          beacon,
+            "beacon_struct":   beacon_struct,
+            "tm":              beacon_melting,
+            "tm_score":        beacon_tm_score,
+            "score":           beacon_score,
+            "R_bn":            R_bn,
+            "R_gr":            R_gr,
+            "F_tm":            F_tm,
+            }
             try:
                 # diseñar dichos primers
                 raw_output = primer3_design_columbo(region, pam_pos - start)
-                parsed_primers = parse_primers_output(raw_output, region)
-                score = score_primers(parsed_primers, pam_pos-start, protospacer_len=23)
-                primers_for_obj[pam_pos] = {
-                    "primers": parsed_primers,
-                    "score": round(score, 2)
-                }
+                try:
+                    parsed_primers = parse_primers_output(raw_output, region)
+                    score = score_primers(raw_output, pam_pos-start, protospacer_len=23)
+                    primers_for_obj[pam_pos] = {
+                        "primers": parsed_primers,
+                        "score": round(score, 2)
+                    }
+                except ValueError as exc:
+                    # Handle the case where no primers are found for this region
+                    primers_for_obj[pam_pos] = {"error": str(exc)}
             except Exception as exc:
+                # Handle other errors in primer design
                 primers_for_obj[pam_pos] = {"error": str(exc)}
     # especificamos el archivo que queremos
     if args.output == "pickle":
@@ -95,25 +111,32 @@ def main() -> None:
         for i, obj in enumerate(top_candidates, 1):
             print(f">>>>>> ColumboPart nº {i} <<<<<<")
             print(f"Creada con el archivo: 📁 route -> {args.fasta}")
-            print(f" PAM: {GREEN}{obj._pam}{RESET}")
-            print(f" Protospacer: {RED}{obj._protospacer}{RESET}")
+            print(f" PAM: {YELL}3'-- {RESET}{GREEN}{obj._pam}{RESET} {YELL}--5'{RESET}")
+            print(f" Amplicon:                {YELL}3'-- {RESET}{CIAN}{str(Seq(obj._protospacer).reverse_complement())}{RESET}{YELL} --5'{RESET} 🎯 Target del Beacon (reversa complementaria)")
+            print(f"                                         ⇄               ")
+            print(f" Hebra complementaria:    {YELL}5'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} --> Hebra complementaria del Protospacer" )
+            print(f"                               |||||||||||||||||||||||      ")
+            print(f" Protospacer:             {YELL}3'--{RESET} {RED}{obj._protospacer}{RESET} {YELL}--5'{RESET} ")
+            print("                                                          ")
             print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
             print(f" Temperatura de melting (Tm): {YELL}{obj._tm:.2f}°C{RESET}")
-            print(f" Scores individuales: {YELL}{obj._scores}{RESET}")
-            print(f" Score global: {YELL}{obj._score_medio:.2f}{RESET}")
+            print(f" Scores individuales = {YELL}{obj._scores}{RESET}")
+            print(f" Score global protospacer = {YELL}{obj._score_medio:.2f}{RESET}")
 
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} :  ")
             print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{obj._protospacer}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET}")
+            print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
-            print(f" Diseño de Beacon: {GREEN}{beacon}{RESET} con Score {YELL}{beacon_score}{RESET}")
-            print(f" Score R_beacon: {YELL}{R_bn}{RESET}, Score R_guide: {YELL}{R_gr}{RESET} ")
-            print(f" RNAfold hairping generado {GREEN}{beacon_struct}{RESET} y una Temperatura de melting {YELL}{beacon_melting:.2f}ºC{RESET} Score tm:{YELL}{beacon_tm_score}{RESET} ")
+            print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
+            print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
+            print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']}{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
+                print(f" Score de primer: {YELL}{0}{RESET}")
             else:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
-                print(f" Score de primer: {YELL}{primer_data['score']:.2f}{RESET}")
+                print(f" Score de primer = {YELL}{primer_data['score']:.2f}{RESET}")
             print("-" * 50)
 
 # para ejecutar la función como principal y que no de error

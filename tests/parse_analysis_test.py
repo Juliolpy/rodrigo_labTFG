@@ -1,6 +1,6 @@
 import pytest
 import subprocess
-from src.core import read_fasta
+from columbo_design.core import read_fasta
 from pathlib import Path
 from src.core import ColumboParts, find_NGG_motivs, process_genome
 
