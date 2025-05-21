@@ -54,7 +54,7 @@ def score_energy(dG: float, thr: float = -15.0) -> float:
     return strenght / (-thr*2)
 
 # vemos que el hairpin tiene efecticamente 11 nt en stem y 9 en el loop
-def hairpin_correct(struct: str, stem_len=11 , loop_len:int=9) -> bool: # true or false
+def hairpin_correct(struct: str, ideal_stem=11 , ideal_loop:int=9) -> bool: # true or false
     r"""
     Función que comprueba en dot-bracket que hay un stem de al menos stem_len pares,
     un loop de al menos loop_len puntos, y luego el stem inverso.
@@ -78,7 +78,13 @@ def hairpin_correct(struct: str, stem_len=11 , loop_len:int=9) -> bool: # true o
     middle = len(re.match(r'^\.+', struct[left:-1:]).group(0)) if re.match(r'^\.+', struct[left:-1:]) else 0
     # parentesis de la derecha, stem_len final
     right = len(re.match(r'\)+', struct[::-1]).group(0)) if re.match(r'\)+', struct[::-1]) else 0
-    return left >= stem_len and right >= stem_len and middle >= loop_len # True si al menos len de parentesis y puntos (stem_len, loop_len)
+    # ahora normalizamos cada parte
+    s_left  = min(left,  ideal_stem) / ideal_stem
+    s_mid   = min(middle,   ideal_loop) / ideal_loop
+    s_right = min(right, ideal_stem) / ideal_stem
+
+    # y devolvemos la media de los tres (valor en [0,1])
+    return (s_left + s_mid + s_right) / 3.0
     
 def beacon_tm(tm: float, t_min:float=50.0, t_floor:float=45.0) -> float:
     """
@@ -134,8 +140,7 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
     seq_amplicon = str(Seq(protospacer).reverse_complement())
     # 1. Estructura
     struct, beacon_mfe = fold_beacon(beacon_seq)
-    if not hairpin_correct(struct):
-        return 0.0, 0.0, 0.0, 0.0, 0.0
+    hp = hairpin_correct(struct)
 
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
@@ -152,10 +157,15 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
     # 5 Energía mínima para la unión beacon con hebra desplazada
     dG = hybridation_energy(beacon_seq, str(Seq(protospacer).reverse_complement()))
     F_e = score_energy(dG, thr=-15.0)
-
+    # componentes de todo el score en una lista
+    score_components = [hp, F, R_bn, R_gr, F_e]
     # Score global
-    score = (R_bn * R_gr * F * F_e )**(1/4)
-    return score, R_bn, R_gr, F, F_e
+    score = 1.0
+    for elements in score_components:
+        score *= elements if elements > 0 else 1e-9
+        score **= (1.0/len(score_components))
+
+    return score, R_bn, R_gr, F, F_e, hp
 
 
 def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:

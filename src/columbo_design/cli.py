@@ -63,7 +63,7 @@ def main() -> None:
             hybridation_e = hybridation_energy(obj._protospacer, str(Seq(obj._protospacer).reverse_complement()))
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
-            beacon_score, R_bn, R_gr, F_tm, F_e = score_beacon(beacon, obj._protospacer, gRNA)
+            beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, obj._protospacer, gRNA)
             beacons_for_obj[obj._position] = {
             "beacon":          beacon,
             "beacon_struct":   beacon_struct,
