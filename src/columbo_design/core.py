@@ -60,18 +60,25 @@ class ColumboParts:
       if position + 3 > len(sequence):
          # saca por pantalla el error de la clase definida arriba
          raise Out_of_frame_ERROR("El PAM no puede calcularse porque se excede la longitud de la secuencia")
-      self._pam = sequence[position : position + 3]
+      pam = sequence[position : position + 3]
+      if not pam[1] == "G" and pam[2] == "G":
+         raise Out_of_frame_ERROR(f"PAM inválido en la posicion {position}:{pam} no tiene estructura NGG ") # descartar PAM inválidos
+      self._pam = pam
       # si la posicion es menor de 20
-      if position < 20: 
+      if position < 25: 
          # saca por pantalla el error definido en la clase de arriba
          raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
-      self._protospacer = sequence[position - 20 : position + 3] 
+      self._protospacer = sequence[position - 25 : position + 3]
+      self._region = sequence[position- 200: position + 300] 
       self._position = position
       self._scores = self.calcular_scores ()
       self._score_medio = sum(self._scores) / len(self._scores) if self._scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
       self._tm = self.calcular_tm()
    
    # redefinimos todos los atributos usando @property
+   @property
+   def region(self): # REGION
+      return self._region
    
    @property
    def pam(self): # PAM
@@ -327,7 +334,7 @@ def process_genome(seq_name: dict, motifs: dict) -> list:
       sequence = seq_name[seq_id]
       for pos in positions:
          # ya que el protospacer no puede ser menor de 20, nuestro codigo no funcionaria: index out of range
-         if pos >= 20 and pos + 3 <= len(sequence):
+         if pos >= 25 and pos + 3 <= len(sequence):
             columbo_list.append(ColumboParts(sequence, pos)) # objeto seq y un int
          else:
             print(f"{RED} ⚠️ [WARNING]⚠️ {RESET} posición {YELL}{pos}{RESET} descartada en {CIAN}{seq_id}{RESET}:{RED}{Out_of_frame_ERROR}{RESET}")
