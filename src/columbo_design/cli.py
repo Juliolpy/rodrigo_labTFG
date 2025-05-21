@@ -135,7 +135,7 @@ def main() -> None:
             print("                                                          ")
             print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} // {GREEN}{str(Seq(beacons_for_obj[obj._position]['beacon']).complement())}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
             print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
-            print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} -> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f}{RESET} kcal/mol, mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
+            print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} -> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f} kcal/mol{RESET} con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
