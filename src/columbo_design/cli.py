@@ -60,6 +60,7 @@ def main() -> None:
             gRNA = str(obj._protospacer) + tracrRNA
             beacon = design_beacon(obj._protospacer)
             beacon_struct, beacon_mfe = fold_beacon(beacon)
+            hybridation_e = hybridation_energy(obj._protospacer, str(Seq(obj._protospacer).reverse_complement()))
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
             beacon_score, R_bn, R_gr, F_tm, F_e = score_beacon(beacon, obj._protospacer, gRNA)
@@ -67,6 +68,7 @@ def main() -> None:
             "beacon":          beacon,
             "beacon_struct":   beacon_struct,
             "beacon_mfe"   :   beacon_mfe,
+            "hybridation_e" :  hybridation_e,
             "tm":              beacon_melting,
             "tm_score":        beacon_tm_score,
             "score":           beacon_score,
@@ -134,8 +136,9 @@ def main() -> None:
             print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
             print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} // {GREEN}{str(Seq(beacons_for_obj[obj._position]['beacon']).complement())}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
+            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer : {YELL}5'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} se une con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
             print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
-            print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} -> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f} kcal/mol{RESET} con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
+            print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} --energía libre estrucutural--> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f} kcal/mol{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
