@@ -21,11 +21,40 @@ def fold_beacon(seq: str) -> str:
     # Convert DNA to RNA (replace T with U)
     rna = seq.replace("T", "U")
     # Use ViennaRNA to fold the RNA sequence
-    struct, _ = RNA.fold(rna)
-    return struct
+    struct, mfe = RNA.fold(rna)
+    return struct, mfe
 
-# vemos que el hairpin tiene efecticamente 8 nt en stem y 6 en el loop
-def hairpin_correct(struct: str, stem_len=8 , loop_len:int=6) -> bool: # true or false
+# Función de energía libre en la hibridación
+def hybridation_energy(beacon: str, target:str) -> float:
+    """
+    Utilizamos RNA.duplexfold
+    Tendremos que convertir primero el beacon a RNA para calcular dicha energía de interacción
+
+    duplexfold devuelve un objeto .energy !! -> el target tiene que ser la non - target strand, la hebra desplazada, la reverse complement de mi protospacer
+
+    """
+    # hacer RNA la secuencia del beacon
+    r_beacon = beacon.replace("T", "U")
+    r_target = target.replace("T", "U")
+
+    return RNA.duplexfold(r_beacon, r_target).energy
+
+# reescalado de energía, score de energía libre
+def score_energy(dG: float, thr: float = -15.0) -> float:
+    """
+    Convierte un ΔG (normalmente negativo) en un valor entre 0 y 1,
+    de modo que para ΔG >= 0 → 0, y para ΔG <= 2*thr → 1, lineal en medio.
+    """
+    # 15 kcal/mol 
+    strenght = -dG
+    if strenght <= 0:
+        return 0.0
+    if strenght >= -thr*2:
+        return 1.0
+    return strenght / (-thr*2)
+
+# vemos que el hairpin tiene efecticamente 11 nt en stem y 9 en el loop
+def hairpin_correct(struct: str, stem_len=11 , loop_len:int=9) -> bool: # true or false
     r"""
     Función que comprueba en dot-bracket que hay un stem de al menos stem_len pares,
     un loop de al menos loop_len puntos, y luego el stem inverso.
@@ -86,7 +115,7 @@ def ratio_complement(seq1: str, seq2: str) -> float:
     matches = sum(1 for a, b in zip(seq1[:min_len], seq2[:min_len]) if base_pair.get(a.upper()) == b.upper())
     return matches / min_len if min_len else 0.0
 
-def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str, tm_floor:float=50.0) -> float:
+def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:float=50.0) -> float:
     """
   Calcula el score del molecular beacon.
 
@@ -104,9 +133,9 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str, tm_floor:floa
     """
     seq_amplicon = str(Seq(protospacer).reverse_complement())
     # 1. Estructura
-    struct = fold_beacon(beacon_seq)
+    struct, beacon_mfe = fold_beacon(beacon_seq)
     if not hairpin_correct(struct):
-        return 0.0, 0.0, 0.0, 0.0
+        return 0.0, 0.0, 0.0, 0.0, 0.0
 
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
@@ -120,24 +149,29 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str, tm_floor:floa
 
     R_gr = 1.0 - ratio_complement(beacon_seq, gRNA_seq[:len(beacon_seq)])
 
+    # 5 Energía mínima para la unión beacon con hebra desplazada
+    dG = hybridation_energy(beacon_seq, str(Seq(protospacer).reverse_complement()))
+    F_e = score_energy(dG, thr=-15.0)
+
     # Score global
-    score = (R_bn * R_gr * F)**(1/3)
-    return score, R_bn, R_gr, F
+    score = (R_bn * R_gr * F * F_e )**(1/4)
+    return score, R_bn, R_gr, F, F_e
 
 
-def design_beacon(protospacer: str, stem_len:int=8, loop_len:int=6) -> str:
+def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:
     """
     Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
     protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
     Deja el fluoróforo en 3' en primera posición del stem.
     """
-    # definimos dominios arbitrarios: aquí s = complement(stem of protospacer[0:stem_len])
+    # definimos dominios arbitrarios: aquí s = complement(stem of protospacer[0:stem_len]) y el target
+    target = str(Seq(protospacer).reverse_complement())
     s_1 = complement(protospacer[:stem_len])[::-1]
     s_2 = s_1[::-1].translate(str.maketrans("ATCG","TAGC"))
     # loop interno r* y t* elegimos secuencias neutrales (A/T rico)
-    l = "A"*loop_len
+    loop_seq = target[stem_len:stem_len + loop_len]
     # beacon = 5'– s + l + s* –3'
-    beacon = s_1 + l + s_2
+    beacon = s_1 + loop_seq + s_2
     return beacon
 
 def complement(seq:str)->str:
