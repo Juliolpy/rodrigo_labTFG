@@ -176,7 +176,7 @@ def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:
      - stem₂ = complement(inverso(stem₁))
     """
     # 1) hebra desplazada (la que se emparejará con beacon)
-    target = str(Seq(protospacer).reverse_complement())
+    target = str(Seq(protospacer[::-1]))
     displaced = target[6:]
 
     # 2) definimos stem₁
