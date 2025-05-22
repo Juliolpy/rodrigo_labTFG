@@ -8,7 +8,7 @@ from Bio.Seq import Seq
 # importamos las funciones del codigo
 from .core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
 from .primer_design import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
-from .beacon import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature, score_energy, hybridation_energy
+from .beacon import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature, score_energy, hybridation_energy, count_hairpin
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
@@ -28,6 +28,7 @@ def main() -> None:
 
     # colores y el tracRNA que es siempre el mismo
     RED = "\033[91m"
+    AZU = "\033[34m"
     CIAN = "\033[96m"
     GREEN = "\033[92m"
     GR = "\033[92m"
@@ -58,8 +59,9 @@ def main() -> None:
             region = full_seq[start:end]
             # funcion beacon
             gRNA = str(obj._protospacer) + tracrRNA
-            beacon = design_beacon(obj._protospacer)
+            beacon = design_beacon(obj._protospacer.replace(" ", ""))
             beacon_struct, beacon_mfe = fold_beacon(beacon)
+            stem1_len, loop_len, stem2_len = count_hairpin(beacon_struct)
             hybridation_e = hybridation_energy(obj._protospacer, str(Seq(obj._protospacer).reverse_complement()))
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
@@ -75,7 +77,10 @@ def main() -> None:
             "R_bn":            R_bn,
             "R_gr":            R_gr,
             "F_tm":            F_tm,
-            "F_e" :            F_e
+            "F_e" :            F_e,
+            "stem1_len":       stem1_len,
+            "stem2_len":       stem2_len,
+            "loop_len":       loop_len
             }
             try:
                 # diseñar dichos primers
@@ -112,40 +117,45 @@ def main() -> None:
         # en este caso no ponemos ningun return porque la funcion main() no la vamos a ejecutar en ningun lado y "and" me iba a devolver solo NGG_positions
         # El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.
         print("\n🔬 Resultados de análisis COLUMBO:\n")
+        right_paren = beacon_struct.count(")")
+        loop_dot = beacon_struct.count(".")
+        left_paren = beacon_struct.count("(")
         for i, obj in enumerate(top_candidates, 1):
             print(f">>>>>> ColumboPart nº {i} <<<<<<")
             print(f"Creada con el archivo: 📁 route -> {args.fasta}")
-            print(f" PAM: {YELL}3'-- {RESET}{GREEN}{obj._pam}{RESET} {YELL}--5'{RESET}")
-            print(f" Amplicon:                {YELL}3'-- {RESET}{CIAN}{str(Seq(obj._protospacer).reverse_complement())}{RESET}{YELL} --5'{RESET} 🎯 Target del Beacon (reversa complementaria)")
-            print(f"                                         ⇄               ")
-            print(f" Hebra complementaria:    {YELL}5'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} --> Hebra complementaria del Protospacer" )
-            print(f" Protospacer:             {YELL}3'--{RESET} {RED}{obj._protospacer}{RESET} {YELL}--5'{RESET}  de longitud {YELL}{len(obj._protospacer)} nt {RESET} ")
-            print("                                                          ")
-            print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
             print("                                           ")
             print(f" Region visual: ")
             print(f" {GREEN}{str(Seq(obj._region).complement())}{RESET}")
             print(f" {RED}{obj._region}{RESET}")
             print("                                           ")
+            print(f" PAM: {YELL}3'-- {RESET}{GREEN}{obj._pam}{RESET} {YELL}--5'{RESET}")
+            print(f" Amplicon:                {YELL}3'-- {RESET}{CIAN}{str(Seq(obj._protospacer).reverse_complement())}{RESET}{YELL} --5'{RESET} --> reversa complementaria")
+            print(f"                                         ⇄               ")
+            print(f" Hebra complementaria:    {YELL}5'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} --> 🎯 Target del Beacon (Hebra complementaria del Protospacer)" )
+            print(f" Protospacer:             {YELL}3'--{RESET} {RED}{obj._protospacer}{RESET} {YELL}--5'{RESET}  de longitud {YELL}{len(obj._protospacer)} nt {RESET} ")
+            print("                                                          ")
+            print(f" Localización del protospacer en el genoma: {YELL}{obj._position}{RESET}")
+            print("                                           ")
             print(f" Temperatura de melting (Tm): {YELL}{obj._tm:.2f}°C{RESET}")
             print(f" Scores individuales = {YELL}{obj._scores}{RESET}")
             print(f" Score global protospacer = {YELL}{obj._score_medio:.2f}{RESET}")
-
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} de longitud = {YELL}{len(tracrRNA)} nt{RESET}")
             print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer).complement().replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
             print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
-            print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} // {GREEN}{str(Seq(beacons_for_obj[obj._position]['beacon']).complement())}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
-            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer : {YELL}5'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} se une con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
-            print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
+            print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
             print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} --energía libre estrucutural--> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f} kcal/mol{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
+            print("                                                          ")
+            print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                         Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
+            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer (HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--3'{RESET} se une con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
+            print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
                 print(f" Score de primer: {YELL}{0}{RESET}")
             else:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
-                print(f" Score de primer = {YELL}{primer_data['score']:.2f}{RESET}")
+                print(f" Score de primers = {YELL}{primer_data['score']:.2f}{RESET}")
             print("-" * 50)
 
 # para ejecutar la función como principal y que no de error

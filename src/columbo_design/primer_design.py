@@ -85,7 +85,8 @@ def parse_primers_output(output, region):
 
     return {
         "left_primer": left_primer,
-        "right_primer": str(Seq(right_primer).reverse_complement())
+        "right_primer": right_primer,
+        "right_primer_revcomp" : str(Seq(right_primer).reverse_complement())
     }
 
 def output_pimers_json(output: dict) -> dict:

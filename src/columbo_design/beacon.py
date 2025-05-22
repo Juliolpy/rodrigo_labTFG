@@ -170,19 +170,41 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
 
 def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:
     """
-    Concatena dominios:  s (stem), r (loop), t* (loop), s* (stem)
-    protospacer ≡ n+x+p (n = nicado seed; x=3nt; p=PAM)
-    Deja el fluoróforo en 3' en primera posición del stem.
+    Construye beacon [stem₁ | loop | stem₂] para que:
+     - stem₁ = primeros stem_len nt de la hebra desplazada
+     - loop   = resto de la hebra desplazada (dejando espacio)
+     - stem₂ = complement(inverso(stem₁))
     """
-    # definimos dominios arbitrarios: aquí s = complement(stem of protospacer[0:stem_len]) y el target
+    # 1) hebra desplazada (la que se emparejará con beacon)
     target = str(Seq(protospacer).reverse_complement())
-    s_1 = complement(protospacer[:stem_len])[::-1]
-    s_2 = s_1[::-1].translate(str.maketrans("ATCG","TAGC"))
-    # loop interno r* y t* elegimos secuencias neutrales (A/T rico)
-    loop_seq = target[stem_len:stem_len + loop_len]
-    # beacon = 5'– s + l + s* –3'
-    beacon = s_1 + loop_seq + s_2
-    return beacon
+    displaced = target[6:]
 
-def complement(seq:str)->str:
-    return seq.translate(str.maketrans("ATCG","TAGC"))
+    # 2) definimos stem₁
+    stem1 = displaced[:stem_len]
+
+    # 3) stem₂ = complemento inverso de stem₁
+    stem2 = str(Seq(stem1).complement()[::-1])
+
+    # 4) todo el trozo intermedio (justo lo que queda entre stems) es el loop
+    loop = displaced[len(stem1) : len(target)-len(stem1)]
+
+    # 4) stem₂ = complemento inverso de stem₁
+    
+    return stem1 + loop + stem2
+
+# funcion auxiliar para contar --> CHATGPT 
+def count_hairpin(struct: str):
+    # 1) stem₁ = run inicial de '('
+    m1 = re.match(r'^\(+', struct)
+    stem1 = len(m1.group(0)) if m1 else 0
+
+    # 2) loop = run de '.' justo después de ese stem₁ (y antes del último ')')
+    middle_region = struct[stem1:len(struct)-stem1]
+    m2 = re.match(r'^\.+', middle_region)
+    loop = len(m2.group(0)) if m2 else 0
+
+    # 3) stem₂ = run final de ')'
+    m3 = re.search(r'\)+$', struct)
+    stem2 = len(m3.group(0)) if m3 else 0
+
+    return stem1, loop, stem2
