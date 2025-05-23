@@ -27,7 +27,7 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    primer3_params = {
       'SEQUENCE_ID': 'test',
       'SEQUENCE_TEMPLATE': sequence,
-      'SEQUENCE_TARGET': [pam_position - 20, 23],
+      'SEQUENCE_TARGET': [pam_position - 25, 28],
       'PRIMER_PRODUCT_SIZE_RANGE': [[65, 165]],
       'PRIMER_TASK': 'generic',
       'PRIMER_MIN_SIZE': 18,
@@ -40,7 +40,7 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    result = primer3.bindings.design_primers(primer3_params, global_args)
    return result
 
-def score_primers(output, pam_relative_pos, protospacer_len=23):
+def score_primers(output, pam_relative_pos, protospacer_len=28):
     # Check if primers were found
     if "PRIMER_LEFT_0" not in output or "PRIMER_RIGHT_0" not in output:
         raise ValueError("No primers found by Primer3 for scoring.")
@@ -53,7 +53,7 @@ def score_primers(output, pam_relative_pos, protospacer_len=23):
     dr = (right_start + protospacer_len - 1) - (pam_relative_pos + protospacer_len - 1)
     
     # (2) puntuación por distancia (1 si esta en el rango y 0 si no)
-    s_df = 1.0 if 27 <= df <= 42 else 0.0
+    s_df = 1.0 if 27 <= df <= 46 else 0.0
     s_dr = 1.0 if 15 <= dr <= 100 else 0.0
     
     # (3) puntuación por contenido GC (máx ->50 %), la da primer3
@@ -84,7 +84,8 @@ def parse_primers_output(output, region):
     right_primer = region[right_start:right_start+right_length]
 
     return {
-        "left_primer": str(Seq(left_primer).complement()),
+        "left_primer": left_primer,
+        "left_primer_comp": str(Seq(left_primer).complement()),
         "right_primer": right_primer,
         "right_primer_revcomp" : str(Seq(right_primer).reverse_complement())
     }
