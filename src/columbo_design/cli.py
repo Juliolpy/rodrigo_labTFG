@@ -36,6 +36,7 @@ def main() -> None:
     MAG = "\033[35m"
     YELL = "\033[33m"
     tracrRNA = "GUUUUAGAGCUAGAAAUAGCAAGUUAAAAUAAGGCUAGUCCGUUAUCAACUUGAAAAAGUGGCACCGAGUCGGUGCUUUUUU"
+    tracrDNA = tracrRNA.upper().replace("U", "T") # Transformamos a DNA para ver complementariedad DNA // DNA
 
     # reclutamos la función get_parse()
     args = get_parse()
@@ -58,14 +59,15 @@ def main() -> None:
             end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
             region = full_seq[start:end]
             # funcion beacon
-            gRNA = str(obj._protospacer) + tracrRNA
-            beacon = design_beacon(obj._protospacer.replace(" ", ""))
+            gRNA = str(obj._protospacer[:-3]) + tracrRNA
+            gDNA = str(obj._protospacer[:-3]) + tracrDNA
+            beacon = design_beacon(obj._beacon_site.replace(" ", ""))
             beacon_struct, beacon_mfe = fold_beacon(beacon)
             stem1_len, loop_len, stem2_len = count_hairpin(beacon_struct)
-            hybridation_e = hybridation_energy(obj._protospacer, str(Seq(obj._protospacer).reverse_complement()))
+            hybridation_e = hybridation_energy(beacon, str(Seq(obj._beacon_site[:30])))
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
-            beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, obj._protospacer, gRNA)
+            beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, obj._beacon_site[:30], gDNA) # score hecho con DNA
             beacons_for_obj[obj._position] = {
             "beacon":          beacon,
             "beacon_struct":   beacon_struct,
@@ -131,6 +133,7 @@ def main() -> None:
             print(f" PAM: {YELL}3'-- {RESET}{GREEN}{obj._pam}{RESET} {YELL}--5'{RESET}")
             print(f" Amplicon:                {YELL}3'-- {RESET}{CIAN}{str(Seq(obj._protospacer).reverse_complement())}{RESET}{YELL} --5'{RESET} --> reversa complementaria")
             print(f"                                         ⇄               ")
+            print(f"Región donde hibrida el Beacon: {YELL}5'--{RESET}{RED}{obj._beacon_site}{RESET}{YELL}--3'{RESET}")
             print(f" Protospacer:             {YELL}5'--{RESET} {RED}{obj._protospacer}{RESET} {YELL}--3'{RESET}  de longitud {YELL}{len(obj._protospacer)} nt {RESET} ")
             print(f" Hebra complementaria:    {YELL}3'--{RESET} {GREEN}{str(Seq(obj._protospacer).complement())}{RESET} {YELL}--5'{RESET} --> Hebra complementaria del Protospacer" )
             print("                                                          ")
@@ -140,14 +143,15 @@ def main() -> None:
             print(f" Scores individuales = {YELL}{obj._scores}{RESET}")
             print(f" Score global protospacer = {YELL}{obj._score_medio:.2f}{RESET}")
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} de longitud = {YELL}{len(tracrRNA)} nt{RESET}")
-            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
+            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer[:-3]).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
             print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
-            print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score GLobal = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
+            print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score Global = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
             print(f" RNAfold hairping generado {GREEN}{beacons_for_obj[obj._position]['beacon_struct']} --energía libre estrucutural--> {RESET}{GREEN}{beacons_for_obj[obj._position]['beacon_mfe']:.4f} kcal/mol{RESET} y una Temperatura de melting {YELL}{beacons_for_obj[obj._position]['tm']:.2f}ºC{RESET} Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
             print("                                                          ")
-            print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                   Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
-            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer (HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._protospacer))}{RESET} {YELL}--3'{RESET} se une con un mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
+            print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
+            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer (HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET} mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
+            print(f"                                                                                                                      {AZU}{obj._beacon_site[:30]}{RESET}")
             print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:

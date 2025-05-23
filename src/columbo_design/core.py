@@ -69,6 +69,7 @@ class ColumboParts:
          # saca por pantalla el error definido en la clase de arriba
          raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
       self._protospacer = sequence[position - 25 : position + 3]
+      self._beacon_site = sequence[position -50: position +3]
       self._region = sequence[position - 200: position + 300] 
       self._position = position
       self._scores = self.calcular_scores ()
@@ -77,7 +78,25 @@ class ColumboParts:
    
    # redefinimos todos los atributos usando @property
    @property
+   def beacon_site(self): # SITIO DE UNIÓN BEACON
+      """
+      Getter para el atributo privado _beacon_site
+
+      :return: Valor del atributo beacon_site
+      :rtype: int
+      
+      """
+      return self._beacon_site
+   
+   @property
    def region(self): # REGION
+      """
+      Getter para el atributo privado _region
+
+      :return: Valor del atributo region
+      :rtype: int
+      
+      """
       return self._region
    
    @property

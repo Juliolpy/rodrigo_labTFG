@@ -30,7 +30,7 @@ def hybridation_energy(beacon: str, target:str) -> float:
     Utilizamos RNA.duplexfold
     Tendremos que convertir primero el beacon a RNA para calcular dicha energía de interacción
 
-    duplexfold devuelve un objeto .energy !! -> el target tiene que ser la non - target strand, la hebra desplazada, la reverse complement de mi protospacer
+    duplexfold devuelve un objeto .energy !! -> el target tiene que ser la non - target strand, la hebra desplazada, la reverse complement de mi beacon_site
 
     """
     # hacer RNA la secuencia del beacon
@@ -121,7 +121,7 @@ def ratio_complement(seq1: str, seq2: str) -> float:
     matches = sum(1 for a, b in zip(seq1[:min_len], seq2[:min_len]) if base_pair.get(a.upper()) == b.upper())
     return matches / min_len if min_len else 0.0
 
-def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:float=50.0) -> float:
+def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:float=50.0) -> float:
     """
   Calcula el score del molecular beacon.
 
@@ -131,14 +131,14 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
     - F(Tm)           → función de activación según Tm mínima requerida.
 
     :param beacon_seq: secuencia del beacon diseñado
-    :param protospacer: la reversa complementaria para hacer el target del beacon
+    :param beacon_site: complementaria para hacer el target del beacon
     :param gRNA_seq: guía CRISPR (protospacer + tracrRNA)
     :param tm_floor: Tm mínima aceptada
     :return: score global, R_beacon:nicada, R_gRNA_libre, F_tm
 
     """
-    seq_amplicon = str(Seq(protospacer).reverse_complement())
     # 1. Estructura
+    beacon_region = beacon_site[:30]
     struct, beacon_mfe = fold_beacon(beacon_seq)
     hp = hairpin_correct(struct)
 
@@ -148,14 +148,14 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
 
     # 3. Ratio beacon:nicada (simulación simple: fraction of complementarity)
     
-    R_bn = ratio_complement(beacon_seq, seq_amplicon)
+    R_bn = ratio_complement(beacon_seq, str(Seq(beacon_region)))
 
     # 4. Ratio gRNA libre = 1 - fraction complementary to beacon
 
     R_gr = 1.0 - ratio_complement(beacon_seq, gRNA_seq[:len(beacon_seq)])
 
     # 5 Energía mínima para la unión beacon con hebra desplazada
-    dG = hybridation_energy(beacon_seq, str(Seq(protospacer).reverse_complement()))
+    dG = hybridation_energy(beacon_seq, str(Seq(beacon_region)))
     F_e = score_energy(dG, thr=-15.0)
     # componentes de todo el score en una lista
     score_components = [hp, F, R_bn, R_gr, F_e]
@@ -168,7 +168,7 @@ def score_beacon(beacon_seq: str, protospacer: str, gRNA_seq: str ,tm_floor:floa
     return score, R_bn, R_gr, F, F_e, hp
 
 
-def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:
+def design_beacon(beacon_site: str, stem_len:int=11, loop_len:int=9) -> str:
     """
     Construye beacon [stem₁ | loop | stem₂] para que:
      - stem₁ = primeros stem_len nt de la hebra desplazada
@@ -176,21 +176,22 @@ def design_beacon(protospacer: str, stem_len:int=11, loop_len:int=9) -> str:
      - stem₂ = complement(inverso(stem₁))
     """
     # 1) hebra desplazada (la que se emparejará con beacon)
-    target = str(Seq(protospacer[::-1]))
-    displaced = target[6:]
+    beacon_region = beacon_site[:30]
+
+    target = str(Seq(beacon_region[::-1]))
 
     # 2) definimos stem₁
-    stem1 = displaced[:stem_len]
+    stem1 = target[:stem_len]
 
     # 3) stem₂ = complemento inverso de stem₁
     stem2 = str(Seq(stem1).complement()[::-1])
 
     # 4) todo el trozo intermedio (justo lo que queda entre stems) es el loop
-    loop = displaced[len(stem1) : len(target)-len(stem1)]
-
+    loop = (target[len(stem1) : len(target)-len(stem1)])
+    loop_real = str(Seq(loop).complement()[::-1])
     # 4) stem₂ = complemento inverso de stem₁
     
-    return stem1 + loop + stem2
+    return stem1 + loop_real + stem2
 
 # funcion auxiliar para contar --> CHATGPT 
 def count_hairpin(struct: str):
