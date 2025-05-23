@@ -56,11 +56,11 @@ def main() -> None:
             full_seq = sequences[seq_id] # solo la secuencia del dict
             # controlar los bordes del genoma
             start = max(0, pam_pos - flank)
-            end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
+            end = min(len(full_seq), pam_pos + 28 + flank)  # 23 = protospacer+PAM
             region = full_seq[start:end]
             # funcion beacon
             gRNA = str(obj._protospacer[:-3]) + tracrRNA
-            gDNA = str(obj._protospacer[:-3]) + tracrDNA
+            gDNA = str(Seq(obj._protospacer[:8]).replace("C","T")) + str(Seq(obj._protospacer[8:-3])) + tracrDNA
             beacon = design_beacon(obj._beacon_site.replace(" ", ""))
             beacon_struct, beacon_mfe = fold_beacon(beacon)
             stem1_len, loop_len, stem2_len = count_hairpin(beacon_struct)
@@ -143,7 +143,7 @@ def main() -> None:
             print(f" Scores individuales = {YELL}{obj._scores}{RESET}")
             print(f" Score global protospacer = {YELL}{obj._score_medio:.2f}{RESET}")
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} de longitud = {YELL}{len(tracrRNA)} nt{RESET}")
-            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer[:-3]).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
+            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer[:8]).replace("T", "U").replace("C","U"))}{RESET}{RED}{str(Seq(obj._protospacer[8:-3]).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
             print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
             print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score Global = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
