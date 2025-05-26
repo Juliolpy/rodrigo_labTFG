@@ -63,9 +63,11 @@ def main() -> None:
             gRNA = str(obj._protospacer[:-3]) + tracrRNA
             gDNA = str(Seq(obj._protospacer[:8]).replace("C","T")) + str(Seq(obj._protospacer[8:-3])) + tracrDNA
             beacon = design_beacon(obj._beacon_site.replace(" ", ""))
+            beacon_region = obj._beacon_site[:len(beacon)]
             beacon_struct, beacon_mfe = fold_beacon(beacon)
             stem1_len, loop_len, stem2_len = count_hairpin(beacon_struct)
-            hybridation_e = hybridation_energy(beacon, str(Seq(obj._beacon_site)))
+            hybridation_e = hybridation_energy(beacon, str(Seq(beacon_region).complement()))
+            score_hybridation = score_energy(hybridation_e)
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
             beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, str(Seq(obj._beacon_site)), gDNA) # score hecho con DNA
@@ -74,6 +76,7 @@ def main() -> None:
             "beacon_struct":   beacon_struct,
             "beacon_mfe"   :   beacon_mfe,
             "hybridation_e" :  hybridation_e,
+            "score_hybridation": score_hybridation,
             "tm":              beacon_melting,
             "tm_score":        beacon_tm_score,
             "score":           beacon_score,
@@ -153,10 +156,11 @@ def main() -> None:
             print(f" Score structural Beacon: {YELL}{beacons_for_obj[obj._position]['hp']:.2f}{RESET}")
             print(f" Score tm = {YELL}{beacons_for_obj[obj._position]['tm_score']:.4f}{RESET}")
             print(f" Unión Beacon con Target mfe score = {YELL}{beacons_for_obj[obj._position]['F_e']:.4f}{RESET}")
+            print(f" Score de hibridation (mfe) --> comprobante = {YELL}{beacons_for_obj[obj._position]['score_hybridation']:.4f}{RESET}")
             print(f" Score R_beacon = {YELL}{beacons_for_obj[obj._position]['R_bn']:.2f}{RESET}, Score R_guide = {YELL}{beacons_for_obj[obj._position]['R_gr']:.2f}{RESET}")
             print("                                                          ")
             print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
-            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer (HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
+            print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
             print(f"                                                                                                                      {AZU}{obj._beacon_site[:30]}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
