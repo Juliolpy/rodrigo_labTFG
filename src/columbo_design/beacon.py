@@ -33,9 +33,10 @@ def hybridation_energy(beacon: str, target:str) -> float:
     duplexfold devuelve un objeto .energy !! -> el target tiene que ser la non - target strand, la hebra desplazada, la reverse complement de mi beacon_site
 
     """
+    beacon_site = target[:30]
     # hacer RNA la secuencia del beacon
     r_beacon = beacon.replace("T", "U")
-    r_target = target.replace("T", "U")
+    r_target = beacon_site.replace("T", "U")
 
     return RNA.duplexfold(r_beacon, r_target).energy
 
@@ -176,7 +177,7 @@ def design_beacon(beacon_site: str, stem_len:int=11, loop_len:int=9) -> str:
      - stem₂ = complement(inverso(stem₁))
     """
     # 1) hebra desplazada (la que se emparejará con beacon)
-    beacon_region = beacon_site[:30]
+    beacon_region = beacon_site[:30] # aquí es donde ajustamos donde queremos que vaya el beacon de nuestra región más grande
 
     target = str(Seq(beacon_region[::-1]))
 

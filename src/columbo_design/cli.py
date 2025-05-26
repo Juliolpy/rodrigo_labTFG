@@ -56,18 +56,19 @@ def main() -> None:
             full_seq = sequences[seq_id] # solo la secuencia del dict
             # controlar los bordes del genoma
             start = max(0, pam_pos - flank)
-            end = min(len(full_seq), pam_pos + 28 + flank)  # 23 = protospacer+PAM
+            end = min(len(full_seq), pam_pos + 25 + flank)  # protospacer+PAM
             region = full_seq[start:end]
+            #region_for_primers = str(Seq(obj._primer_region))
             # funcion beacon
             gRNA = str(obj._protospacer[:-3]) + tracrRNA
             gDNA = str(Seq(obj._protospacer[:8]).replace("C","T")) + str(Seq(obj._protospacer[8:-3])) + tracrDNA
             beacon = design_beacon(obj._beacon_site.replace(" ", ""))
             beacon_struct, beacon_mfe = fold_beacon(beacon)
             stem1_len, loop_len, stem2_len = count_hairpin(beacon_struct)
-            hybridation_e = hybridation_energy(beacon, str(Seq(obj._beacon_site[:30])))
+            hybridation_e = hybridation_energy(beacon, str(Seq(obj._beacon_site)))
             beacon_melting = melting_temperature(beacon)
             beacon_tm_score = beacon_tm(beacon_melting)
-            beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, obj._beacon_site[:30], gDNA) # score hecho con DNA
+            beacon_score, R_bn, R_gr, F_tm, F_e, hp = score_beacon(beacon, str(Seq(obj._beacon_site)), gDNA) # score hecho con DNA
             beacons_for_obj[obj._position] = {
             "beacon":          beacon,
             "beacon_struct":   beacon_struct,
@@ -83,14 +84,14 @@ def main() -> None:
             "hp":              hp,
             "stem1_len":       stem1_len,
             "stem2_len":       stem2_len,
-            "loop_len":       loop_len
+            "loop_len":        loop_len
             }
             try:
                 # diseñar dichos primers
                 raw_output = primer3_design_columbo(region, pam_pos - start)
                 try:
                     parsed_primers = parse_primers_output(raw_output, region)
-                    score = score_primers(raw_output, pam_pos-start, protospacer_len=23)
+                    score = score_primers(raw_output, pam_pos-start, protospacer_len=25)
                     primers_for_obj[pam_pos] = {
                         "primers": parsed_primers,
                         "score": round(score, 2)

@@ -7,6 +7,7 @@ import pickle
 from Bio.Seq import Seq
 import primer3
 
+
 def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    """
    Función que utiliza programa primer3  invocado con subprocess para diseñar primers, toma como input: una secuencia y la posicion del pam
@@ -18,6 +19,11 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    :rtype: dict
    
    """
+   protospacer_len = 25   # tu longitud upstream
+   start_ps      = pam_position - protospacer_len    # primera base del protospacer
+   end_pam       = pam_position + 3   
+   primer_min = 18
+   primer_max = 22 
 
    # Clean and prepare the sequence
    sequence = sequence.upper()
@@ -27,11 +33,11 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    primer3_params = {
       'SEQUENCE_ID': 'test',
       'SEQUENCE_TEMPLATE': sequence,
-      'SEQUENCE_TARGET': [pam_position - 25, 28],
+      'SEQUENCE_TARGET': [start_ps, protospacer_len + 3],
       'PRIMER_PRODUCT_SIZE_RANGE': [[65, 165]],
       'PRIMER_TASK': 'generic',
-      'PRIMER_MIN_SIZE': 18,
-      'PRIMER_MAX_SIZE': 22,
+      'PRIMER_MIN_SIZE': primer_min,
+      'PRIMER_MAX_SIZE': primer_max,
       'PRIMER_NUM_RETURN': 5
    }
    global_args = {}
@@ -53,8 +59,8 @@ def score_primers(output, pam_relative_pos, protospacer_len=28):
     dr = (right_start + protospacer_len - 1) - (pam_relative_pos + protospacer_len - 1)
     
     # (2) puntuación por distancia (1 si esta en el rango y 0 si no)
-    s_df = 1.0 if 27 <= df <= 46 else 0.0
-    s_dr = 1.0 if 15 <= dr <= 100 else 0.0
+    s_df = 1.0 if 25 <= df <= 40 else 0.0
+    s_dr = 1.0 if 14 <= dr <= 100 else 0.0
     
     # (3) puntuación por contenido GC (máx ->50 %), la da primer3
     def gc_score(gc_percent):
