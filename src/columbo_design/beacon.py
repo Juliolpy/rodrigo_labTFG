@@ -33,10 +33,9 @@ def hybridation_energy(beacon: str, target:str) -> float:
     duplexfold devuelve un objeto .energy !! -> el target tiene que ser la non - target strand, la hebra desplazada, la reverse complement de mi beacon_site
 
     """
-    beacon_site = target[:30]
     # hacer RNA la secuencia del beacon
     r_beacon = beacon.replace("T", "U")
-    r_target = beacon_site.replace("T", "U")
+    r_target = target.replace("T", "U")
 
     return RNA.duplexfold(r_beacon, r_target).energy
 
@@ -139,7 +138,7 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
 
     """
     # 1. Estructura
-    beacon_region = beacon_site[:30]
+    beacon_region = beacon_site[:len(beacon_seq)]
     struct, beacon_mfe = fold_beacon(beacon_seq)
     hp = hairpin_correct(struct)
 
@@ -156,7 +155,7 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
     R_gr = 1.0 - ratio_complement(beacon_seq, gRNA_seq[:len(beacon_seq)])
 
     # 5 Energía mínima para la unión beacon con hebra desplazada
-    dG = hybridation_energy(beacon_seq, str(Seq(beacon_region)))
+    dG = hybridation_energy(beacon_seq, str(Seq(beacon_region).complement()))
     F_e = score_energy(dG, thr=-15.0)
     # componentes de todo el score en una lista
     score_components = [hp, F, R_bn, R_gr, F_e]
