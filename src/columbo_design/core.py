@@ -69,7 +69,7 @@ class ColumboParts:
          # saca por pantalla el error definido en la clase de arriba
          raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
       self._protospacer = sequence[position - 25 : position + 3]
-      self._beacon_site = sequence[position - 50: position +3]
+      self._beacon_site = sequence[position - 50: position + 3]
       self._region = sequence[position - 200: position + 300]
       self._primer_region = sequence[position - 40 : position + 40]
       self._position = position

@@ -7,8 +7,8 @@ import pickle
 from Bio.Seq import Seq
 import primer3
 
-
-def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
+# le damos ya los parametros definidos de serie y solo necesitaria la seq y la pam_pos ( un int)
+def primer3_design_columbo(seq: str, pam_pos: int) -> dict:
    """
    Función que utiliza programa primer3  invocado con subprocess para diseñar primers, toma como input: una secuencia y la posicion del pam
 
@@ -19,34 +19,37 @@ def primer3_design_columbo(sequence: str, pam_position: int) -> dict:
    :rtype: dict
    
    """
-   protospacer_len = 25   # tu longitud upstream
-   start_ps      = pam_position - protospacer_len    # primera base del protospacer
-   end_pam       = pam_position + 3   
-   primer_min = 18
-   primer_max = 22 
-
    # Clean and prepare the sequence
-   sequence = sequence.upper()
-   sequence = re.sub(r'[^ATCG]', '', sequence)
+   seq = seq.upper()
+   seq = re.sub(r'[^ATCG]', '', seq)
+   # parametros
+   protospacer_len = 25   # tu longitud upstream
 
    # Prepare Primer3 parameters
    primer3_params = {
-      'SEQUENCE_ID': 'test',
-      'SEQUENCE_TEMPLATE': sequence,
-      'SEQUENCE_TARGET': [start_ps, protospacer_len + 3],
-      'PRIMER_PRODUCT_SIZE_RANGE': [[65, 165]],
+      'SEQUENCE_ID': 'amp',
+      'SEQUENCE_TEMPLATE': seq,
+      'PRIMER_PRODUCT_SIZE_RANGE': [[65, 92]],
+      'SEQUENCE_INCLUDED_REGION': [pam_pos - 40,  40*2 + 3],
+      'PRIMER_PICK_LEFT_PRIMER':   1,
+      'PRIMER_PICK_RIGHT_PRIMER':  1,
+      'PRIMER_MIN_SIZE':           16,            
+      'PRIMER_MAX_SIZE':           25,
+      'PRIMER_MIN_TM':             55,
+      'PRIMER_OPT_TM':             60,
+      'PRIMER_MAX_TM':             65,
+      'PRIMER_MIN_GC':             30,
+      'PRIMER_MAX_GC':             70,
+      'PRIMER_NUM_RETURN':         5,
       'PRIMER_TASK': 'generic',
-      'PRIMER_MIN_SIZE': primer_min,
-      'PRIMER_MAX_SIZE': primer_max,
-      'PRIMER_NUM_RETURN': 5
    }
    global_args = {}
 
    # Call Primer3 and return the result
-   result = primer3.bindings.design_primers(primer3_params, global_args)
-   return result
+   out = primer3.bindings.design_primers(primer3_params, global_args)
+   return out
 
-def score_primers(output, pam_relative_pos, protospacer_len=28):
+def score_primers(output, pam_relative_pos, protospacer_len=25):
     # Check if primers were found
     if "PRIMER_LEFT_0" not in output or "PRIMER_RIGHT_0" not in output:
         raise ValueError("No primers found by Primer3 for scoring.")

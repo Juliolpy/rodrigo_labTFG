@@ -7,7 +7,7 @@ import argparse
 from Bio.Seq import Seq
 # importamos las funciones del codigo
 from .core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
-from .primer_design import primer3_design_columbo, parse_primers_output, output_pimers_json, output_primers_pickle, score_primers
+from .primer_design import primer3_design_columbo, output_pimers_json, output_primers_pickle, score_primers, parse_primers_output
 from .beacon import design_beacon, score_beacon, fold_beacon, beacon_tm, melting_temperature, score_energy, hybridation_energy, count_hairpin
 
 # definimos nuestra funcion parser
@@ -51,13 +51,15 @@ def main() -> None:
     for seq_id, seq in sequences.items():
         for obj in top_candidates:
             # definir region alrrederor del PAM para diseñar los primers ( x nt upstream y downstream)
-            flank = 100
             pam_pos = obj._position
             full_seq = sequences[seq_id] # solo la secuencia del dict
-            # controlar los bordes del genoma
-            start = max(0, pam_pos - flank)
-            end = min(len(full_seq), pam_pos + 25 + flank)  # protospacer+PAM
-            region = full_seq[start:end]
+            flank = 40
+            start = max(0,pam_pos - flank)
+            end = min(len(full_seq), pam_pos + 25 + flank)
+            if start < 0 or end > len(full_seq):
+                raise ValueError("El flanqueo sale de los límites de la secuencia.")
+            # objetos para la funcion de primers
+            subseq = full_seq[start:end]
             #region_for_primers = str(Seq(obj._primer_region))
             # funcion beacon
             gRNA = str(obj._protospacer[:-3]) + tracrRNA
@@ -91,10 +93,10 @@ def main() -> None:
             }
             try:
                 # diseñar dichos primers
-                raw_output = primer3_design_columbo(region, pam_pos - start)
+                raw_output = primer3_design_columbo(subseq, pam_pos - start)
                 try:
-                    parsed_primers = parse_primers_output(raw_output, region)
-                    score = score_primers(raw_output, pam_pos-start, protospacer_len=25)
+                    parsed_primers = parse_primers_output(raw_output, subseq)
+                    score = score_primers(raw_output, pam_pos - start, protospacer_len=25)
                     primers_for_obj[pam_pos] = {
                         "primers": parsed_primers,
                         "score": round(score, 2)
@@ -108,11 +110,11 @@ def main() -> None:
     # especificamos el archivo que queremos
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
-        pickle_primers = output_primers_pickle(raw_output)
+        pickle_primers = output_primers_pickle(primers_for_obj)
         print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
     else:
         json_file = output_NGG_json(top_candidates)
-        json_primers = output_pimers_json(raw_output)
+        json_primers = output_pimers_json(primers_for_obj)
         print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
     # imprimir resultados
     for seq_id, pos in NGG_positions.items():
