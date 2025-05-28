@@ -71,24 +71,12 @@ class ColumboParts:
       self._protospacer = sequence[position - 25 : position + 3]
       self._beacon_site = sequence[position - 50: position + 3]
       self._region = sequence[position - 200: position + 300]
-      self._primer_region = sequence[position - 40 : position + 40]
       self._position = position
       self._scores = self.calcular_scores ()
       self._score_medio = sum(self._scores) / len(self._scores) if self._scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
       self._tm = self.calcular_tm()
    
    # redefinimos todos los atributos usando @property
-   @property
-   def primer_region(self): # TARGET DE PRIMER3
-      """
-      Getter para el atributo privado _primer_region
-
-      :return: Valor del atributo primer_region
-      :rtype: int
-      
-      """
-      return self._primer_region
-   
    @property
    def beacon_site(self): # SITIO DE UNIÓN BEACON
       """

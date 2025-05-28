@@ -30,7 +30,7 @@ def primer3_design_columbo(seq: str, pam_pos: int) -> dict:
       'SEQUENCE_ID': 'amp',
       'SEQUENCE_TEMPLATE': seq,
       'PRIMER_PRODUCT_SIZE_RANGE': [[65, 92]],
-      'SEQUENCE_INCLUDED_REGION': [pam_pos - 40,  40*2 + 3],
+      'SEQUENCE_INCLUDED_REGION': [pam_pos - 45,  45*2 + 3],
       'PRIMER_PICK_LEFT_PRIMER':   1,
       'PRIMER_PICK_RIGHT_PRIMER':  1,
       'PRIMER_MIN_SIZE':           16,            

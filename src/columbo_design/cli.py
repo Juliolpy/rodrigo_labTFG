@@ -53,7 +53,7 @@ def main() -> None:
             # definir region alrrederor del PAM para diseñar los primers ( x nt upstream y downstream)
             pam_pos = obj._position
             full_seq = sequences[seq_id] # solo la secuencia del dict
-            flank = 40
+            flank = 45
             start = max(0,pam_pos - flank)
             end = min(len(full_seq), pam_pos + 25 + flank)
             if start < 0 or end > len(full_seq):
