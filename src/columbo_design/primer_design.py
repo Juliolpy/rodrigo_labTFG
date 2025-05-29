@@ -86,10 +86,24 @@ def score_primers(output, pam_relative_pos, protospacer_len=25):
     df = pam_relative_pos - left_start
     dr = (right_start + protospacer_len - 1) - (pam_relative_pos + protospacer_len - 1)
     
-    # (2) puntuación por distancia (1 si esta en el rango y 0 si no)
-    s_df = 1.0 if 19 <= df <= 40 else 0.0
+    # (2a) puntuación por distancia (1 si esta en el rango y 0 si no)
+    s_df = 1.0 if 19 <= df <= 45 else 0.0
     s_dr = 1.0 if 14 <= dr <= 100 else 0.0
-    
+    # (2b) solapamiento entre el cebador 
+    # El protospacer empezará en la región PAM - 25 --> pam_relative_pos - protospacer_len
+    prot_start = pam_relative_pos - protospacer_len
+    prot_end = pam_relative_pos + 3
+    primer_end = left_start + output["PRIMER_LEFT_0"][1]
+    # calculo de solapamiento
+    overlap_start = max(left_start, prot_start)
+    overlap_end = min(primer_end, prot_end)
+    overlap_len = max(0, overlap_end - overlap_start)
+    # score de solapamiento: 0 si = 0 o > 7, lineal 1..7 -> 1.0
+    if overlap_len == 0 or overlap_len > 7:
+        s_ov = 0.0
+    else:
+        s_ov = overlap_len / 7.0
+
     # (3) puntuación por contenido GC (máx ->50 %), la da primer3
     def gc_score(gc_percent):
         return 1.0 - abs(gc_percent - 50)/50 # 1.0 si gc = 50, decae linealmente
@@ -103,7 +117,7 @@ def score_primers(output, pam_relative_pos, protospacer_len=25):
     s_tm = (tm_score(output['PRIMER_LEFT_0_TM']) + tm_score(output['PRIMER_RIGHT_0_TM'])) / 2
 
     # score global, dandole más importancia a la distancia
-    score_global = 0.5 * (s_df * s_dr) + 0.25 * s_gc + 0.25 * s_tm
+    score_global = 0.4 * (s_df * s_dr) + 0.2 * s_gc + 0.2 * s_tm + 0.2 * s_ov
     return score_global
 
 def parse_primers_output(output, region):

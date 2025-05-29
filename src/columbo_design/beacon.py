@@ -226,7 +226,7 @@ def design_beacon(beacon_site: str, stem_len:int=11, loop_len:int=9) -> str:
     :rtype: str
     """
     # 1) hebra desplazada (la que se emparejará con beacon)
-    beacon_region = beacon_site[:30] # aquí es donde ajustamos donde queremos que vaya el beacon de nuestra región más grande
+    beacon_region = beacon_site[:31] # aquí es donde ajustamos donde queremos que vaya el beacon de nuestra región más grande
 
     target = str(Seq(beacon_region[::-1]))
 

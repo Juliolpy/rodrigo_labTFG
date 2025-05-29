@@ -174,7 +174,7 @@ def main() -> None:
             print(f" Scores individuales = {YELL}{obj._scores}{RESET}")
             print(f" Score global protospacer = {YELL}{obj._score_medio:.2f}{RESET}")
             print(f" TracrRNA Streptococcus pyogenes Cas9 {CIAN}{tracrRNA}{RESET} de longitud = {YELL}{len(tracrRNA)} nt{RESET}")
-            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer[:8]).replace("T", "U").replace("C","U"))}{RESET}{RED}{str(Seq(obj._protospacer[8:-3]).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
+            print(f" Guide RNA (gRNA) resultante {GR}5'--{RESET}{RED}{str(Seq(obj._protospacer[:9]).replace("T", "U").replace("C","U"))}{RESET}{RED}{str(Seq(obj._protospacer[9:-3]).replace("T", "U"))}{RESET}{CIAN}{tracrRNA}{RESET}{GR}--3'{RESET} de longitud = {YELL}{len(tracrRNA)+len(obj._protospacer)} nt{RESET}")
             print(f" gRNA (corte): {MAG}{gRNA[:len(beacon)]}{RESET}")
             print("                                                          ")
             print(f" Diseño de Beacon: {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET} con Score Global = {YELL}{beacons_for_obj[obj._position]['score']:.2f}{RESET}")
@@ -187,7 +187,7 @@ def main() -> None:
             print("                                                          ")
             print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
             print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
-            print(f"                                                                                                                      {AZU}{obj._beacon_site[:30]}{RESET}")
+            print(f"                                                                                                                      {AZU}{obj._beacon_site[:31]}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
