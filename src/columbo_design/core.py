@@ -22,10 +22,10 @@ YELL = "\033[33m"
 # crea una CLASE para hacer un RAISE para crear excepciones
 class Out_of_frame_ERROR(Exception):
    """
-   >--Excepción personalizada dentro de una clase para indicar que nuestro archivo tipo Seq no tiene el tamaño requerido--<
+   Exception raised when a PAM or protospacer falls outside the bounds of the sequence.
 
-   :param mensaje: Mensaje de error por tamaño
-   :type mensaje: str
+   :param message: Error message to display
+   :type message: str
 
    """
    def __init__(self, mensaje = "El PAM o Protospacer no tienen el tamaño mínimo requerido"):
@@ -35,26 +35,20 @@ class Out_of_frame_ERROR(Exception):
 # vamos a definir la clase ColumboParts   
 class ColumboParts:
    """
-   Clase donde se almacenan las instancias correspondientes al score y tm
+   Represents a CRISPR-Cas9 protospacer candidate (Columbo part). Stores sequence, scores, and melting temperature.
 
-   :param sequence: Objeto Seq a analizar
+   :param sequence: Full DNA sequence as a Biopython Seq object
    :type sequence: Seq
-   :param position: Posición de la repetición NGG (sitio PAM)
+   :param position: Zero-based index of the PAM start (NGG) within `sequence`
    :type position: int
 
    """
    def __init__(self, sequence: Seq, position : int): 
       """
-      Función Constructora donde sequence es un objeto seq y la posición un número entero donde se encuentra cada nt
-      si la posición + 3 es mayor que la longitud de la secuencia
+      Initialize a ColumboParts instance. Validates PAM and protospacer frame and computes scores.
 
-      :raises TypeError: Error obj Seq &/o int no reconocido
-
-      ..note::
-         Este programa solo admite objetos Seq: .fasta
-
-      ..warning::
-         No usar floats
+      :raises OutOfFrameError: If PAM or protospacer exceed sequence boundaries or invalid PAM
+      :raises TypeError: If incorrect types are passed
       
       """
       if position + 3 > len(sequence):
@@ -78,136 +72,131 @@ class ColumboParts:
    
    # redefinimos todos los atributos usando @property
    @property
-   def beacon_site(self): # SITIO DE UNIÓN BEACON
+   def beacon_site(self) -> Seq: # SITIO DE UNIÓN BEACON
       """
-      Getter para el atributo privado _beacon_site
+      Sequence region used for beacon design (50 nt upstream + PAM).
 
-      :return: Valor del atributo beacon_site
-      :rtype: int
+      :return: Beacon site sequence
+      :rtype: Seq
       
       """
       return self._beacon_site
    
    @property
-   def region(self): # REGION
+   def region(self) -> Seq: # REGION
       """
-      Getter para el atributo privado _region
+      Flanking region around protospacer (200 nt upstream to 300 nt downstream).
 
-      :return: Valor del atributo region
-      :rtype: int
+      :return: Sequence region
+      :rtype: Seq
       
       """
       return self._region
    
    @property
-   def pam(self): # PAM
+   def pam(self) -> Seq: # PAM
       """
-      Getter para el atributo privado _pam
+      PAM sequence (3 nt NGG).
 
-      :return: Valor del atributo pam
-      :rtype: int
+      :return: PAM sequence
+      :rtype: Seq
       
       """
       return self._pam
+   
    @property
-   def position(self): # POSITION
+   def position(self) -> int: # POSITION
       """
-      Getter para el atributo privado _position
+      Position of PAM within the original sequence.
 
-      :return: Valor del atributo position
+      :return: Zero-based index of PAM
       :rtype: int
       
       """
       return self._position
    @property
-   def protospacer(self): # PROTOSPACER
+   def protospacer(self) -> Seq: # PROTOSPACER
       """
-      Getter para el atributo privado _protospacer
+      Protospacer sequence (25 nt + PAM).
 
-      :return: Valor del atributo protospacer
-      :rtype: str
+      :return: Protospacer
+      :rtype: Seq
       
       """
       return self._protospacer
    
    @property
-   def scores(self): #SCORE
+   def scores(self) -> float: #SCORE
       """
-      Getter para el atributo privado _scores
+      Mean score across all features.
 
-      :return: Valor del atributo _scores
-      :rtype: int
+      :return: Average score
+      :rtype: float
       
       """
       return self._scores
    
    @property
-   def score_medio(self):  #SCORE_MEDIO
+   def score_medio(self) -> list[int]:  #SCORE_MEDIO
       """
-      Getter para el atributo privado _score_medio
+      List of individual feature scores [gc_content, no_G_before_pam, no_T_2_upstream, no_homopolymer].
 
-      :return: Valor del atributo score_medio
-      :rtype: int
+      :return: Individual scores
+      :rtype: list[int]
       
       """
       return self._score_medio
    
    @property
-   def tm(self):  # TM
+   def tm(self) -> float:  # TM
       """
-      Getter para el atributo privado _tm
+      Melting temperature of the protospacer (in °C).
 
-      :return: Valor del atributo tm
-      :rtype: str
-      
+      :return: Melting temperature
+      :rtype: float
+
       """
       return self._tm
       
    # Funciones separadas
-   def calc_1(self): # 1
+   def calc_1(self) -> int: # 1
       """
-      Función 1 -->El contenido de la seed_region de GC ha de ser meno de 80%
-      Suma 1 si el contendo de G + C dividido entre la longitud del protospacer es menor a 0.8
+      Score 1: 1 if GC content of protospacer < 80%, else 0.
 
-      :return: primer score
+      :return: 1 or 0
       :rtype: int
 
-      
       """
       score_1 = 1 if (self._protospacer.count("G") + self._protospacer.count("C")) / len(self._protospacer) < 0.8 else 0
       return score_1 # primer score
    
-   def calc_2(self): # 2
+   def calc_2(self) -> int: # 2
       """
-      Función 2--> Que no haya una G antes de la PAM NGG
-      Suma 1 en el caso de que no haya un G antes de la PAM upstream, si no es 0
+      Score 2: 1 if the base immediately upstream of PAM is not 'G', else 0.
 
-
-      :return: segundo score
+      :return: 1 or 0
       :rtype: int
       
       """
       score_2 = 0 if self._protospacer[-5] == "G" else 1
       return score_2 # segundo score
    
-   def calc_3(self): # 3
+   def calc_3(self) -> int: # 3
       """
-      Función 3--> Que no haya una T 2 posiciones upstream de la PAM, ej: 5' -----TXNGG---> 3'
-      Suma 1 en el caso de que no haya una T 2 posiciones upstream, si no es 0
+      Score 3: 1 if the base two positions upstream of PAM is not 'T', else 0.
 
-      :return: tercer score
+      :return: 1 or 0
       :rtype: int
       
       """
       score_3 = 1 if self._protospacer[-7] != "T" else 0
       return score_3 # tercer score
    
-   def calc_4(self): # 4
+   def calc_4(self) -> int: # 4
       """
-      Función 4--> Que no haya ningun triplete de la misma base, AAA, CCC , TTT , GGG
-      Suma 1 en el caso de que no hayan repeticiones de trinucleótidos de la misma base, si no es 0
+      Score 4: 1 if no homopolymer triplet (AAA, CCC, GGG, TTT), else 0.
 
-      :return: cuarto score
+      :return: 1 or 0
       :rtype: int
       
       """
@@ -216,34 +205,35 @@ class ColumboParts:
    
 
    # definimos la función del score_global
-   def calcular_scores(self): # GLOBAL
+   def calcular_scores(self) ->list[int]: # GLOBAL
       """
-      Función global que suma todas las funciones definidas anteriores
-      :return: lista de scores
-      :rtype: list
+      Compute all four individual scores.
+
+      :return: List of four scores
+      :rtype: list[int]
       
       """
       score_list = [ self.calc_1() , self.calc_2(), self.calc_3(), self.calc_4()] # recuerda usar () para ejecutar las funciones
       return score_list
     
    # Función para calcular la temperatura de melting del protospacer
-   def calcular_tm(self):
+   def calcular_tm(self) -> float:
       """
-      Devuelve la temperatura de melting del protospacer
+      Compute melting temperature using nearest-neighbor method.
 
-      :return: Temperatura de melting del prospacer
-      :rtype: str
+      :return: Melting temperature in °C
+      :rtype: float
 
       """
       melting = mt.Tm_NN(self._protospacer) if self._protospacer else 0 # para calcular la tm del protospcaer
       return melting
    
    # transformar el self en diccionairo para qeu pueda ser transfomrado en json
-   def to_dict(self):
+   def to_dict(self) -> dict:
      """
-    Convierte la instancia de la clase en un diccionario
-     
-     :return: diccionario con [keys] títulos de cada cosa y [values] los objetos de self definidos en __init__
+     Serialize instance to a dictionary.
+
+     :return: Dict with keys ['PAM','Protospacer','Position','Scores','Score_medio','Tm']
      :rtype: dict
 
      """
@@ -257,24 +247,24 @@ class ColumboParts:
      }
    def to_json(self):
       """
-      Serializa la instancia en formato JSON
+      Serialize instance to JSON string.
 
-      :return: JSONI con objetos ColumboParts
+      :return: JSON representation
       :rtype: str
-
-      
+ 
       """
       return json.dumps(self.to_dict()) # json lee los datos y los almacena
    
    @classmethod
    def from_parts(cls, sequence, data):
       """
-      Creamos una instancia en la clase ColumboParts a partir del diccionario
-      :param sequence: Secuencia completa donde se encuentran el PAM y protospacer.
+      Reconstruct ColumboParts from a dict of properties.
+
+      :param sequence: Original full sequence
       :type sequence: Seq
-      :param data: Diccionario con los datos necesarios para reconstruir la instancia.
+      :param data: Dict with keys matching to_dict()
       :type data: dict
-      :return: Instancia de ColumboParts
+      :return: New ColumboParts instance
       :rtype: ColumboParts
 
       """
@@ -282,13 +272,13 @@ class ColumboParts:
    @classmethod
    def from_json(cls, sequence, json_str): # cls en vez de self
       """
-      Creamos una instancia en la clase ColumboParts a partir un str JSON
+      Reconstruct ColumboParts from a JSON string.
 
-      :param sequence: Secuencia completa donde se encuentran el PAM y protospacer.
+      :param sequence: Original full sequence
       :type sequence: Seq
-      :param json_str: JSON con los datos de la instancia.
+      :param json_str: JSON string as produced by to_json()
       :type json_str: str
-      :return: Instancia de ColumboParts
+      :return: New ColumboParts instance
       :rtype: ColumboParts
 
       """
@@ -298,13 +288,12 @@ class ColumboParts:
 # estas funciones behind the musgo, fuera de la clase
 def read_fasta(fastafile: str) -> dict:
    """
-   Función que se encarga de leer el archivo con extensión .fasta que se introduce
+   Read a FASTA file into a dict of clean DNA sequences.
 
-   :param fastafile: Archivo fasta a analizar
+   :param fastafile: Path to FASTA file
    :type fastafile: str
-
-   :return: String con los nombres y su secuencia correspondiente
-   :rtype: str
+   :return: Dict mapping record IDs to uppercase ATCG-only strings
+   :rtype: dict[str, str]
    
    """
    
@@ -317,13 +306,12 @@ def read_fasta(fastafile: str) -> dict:
 
 def find_NGG_motivs(seq_name: dict) -> dict:
    """
-   Función que se encarga de encontrar las PAM (motivos NGG) dentro de la sencuencia del fasta
+   Find all NGG PAM motifs in each sequence.
 
-   :param seq_name: Diccionario que contiene nombres y sus secuencias correspondientes
-   :type seq_name: dict
-
-   :return: Diccionario con las posiciones de los motivos NGG para cada secuencia
-   :rtype: dict 
+   :param sequences: Dict of ID -> sequence
+   :type sequences: dict
+   :return: Dict of ID -> list of zero-based PAM start positions
+   :rtype: dict[str, list[int]]
    
    """
    # diccionario donde guardamos las posiciones de los motivos NGG
@@ -337,15 +325,12 @@ def find_NGG_motivs(seq_name: dict) -> dict:
 
 def process_genome(seq_name: dict, motifs: dict) -> list:
    """
-   Función que procesa un fasta, identifica los sitios NGG y crea  objetos ColumboParts 
-   para cada uno, los evalúa y devuelve los 20 mejores candidatos ordenados por su score_medio
-   
-   :param seq_name: Diccionario con el nombre [keys] y su correspondiente secuencia de fasta [values]
-   :type seq_name: dict
-   :param motifs: Diccionario con las posiciones de cada motivo NGG
+   Build ColumboParts for each valid PAM and return top 20 by average score.
 
-   :return: Lista creada tras evaluar los diccionarios con las instancias de ColumboParts
-   :rtype: list
+   :param sequences: Dict of ID -> sequence
+   :param motifs: Dict of ID -> list of PAM positions
+   :return: Top 20 ColumboParts instances, sorted by score_medio descending
+   :rtype: list[ColumboParts]
    
    """
    columbo_list = []
@@ -363,13 +348,12 @@ def process_genome(seq_name: dict, motifs: dict) -> list:
  
 def output_NGG_json(motifs: dict) -> dict:  #JSON
       """
-      Devuelve un archivo json con los objetos creados por ColumboParts
+      Write top ColumboParts to output_NGG.json and return list of dicts.
 
-      :param motifs: Diccionario con las posiciones de los motivos NGG
-      :type: dict
-
-      :return: Diccionario en formato .json
-      :rtype: dict
+      :param parts: List of ColumboParts
+      :type parts: list
+      :return: List of serialized dicts
+      :rtype: list[dict]
       
       """
    # guardamos los datos en json en file
@@ -382,15 +366,14 @@ def output_NGG_json(motifs: dict) -> dict:  #JSON
 
 def output_NGG_pickle(motifs: dict) -> dict:    # PICKLE
    """
-      Devuelve un archivo pickle con los objetos creados por ColumboParts
-      
-      :param motifs: Diccionario con las posiciones de los motivos NGG
-      :type: dict
+   Write top ColumboParts to output_NGG.pkl and return list of dicts.
 
-      :return: Diccionario en formato .pickle
-      :rtype: dict
+   :param parts: List of ColumboParts
+   :type parts: list
+   :return: List of serialized dicts
+   :rtype: list[dict]
       
-      """
+   """
 
     # guardamos los datos en pickle en file
    with open("output_NGG.pkl", "wb") as file:
