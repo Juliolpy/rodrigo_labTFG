@@ -87,7 +87,7 @@ def score_primers(output, pam_relative_pos, protospacer_len=25):
     dr = (right_start + protospacer_len - 1) - (pam_relative_pos + protospacer_len - 1)
     
     # (2) puntuación por distancia (1 si esta en el rango y 0 si no)
-    s_df = 1.0 if 25 <= df <= 40 else 0.0
+    s_df = 1.0 if 19 <= df <= 40 else 0.0
     s_dr = 1.0 if 14 <= dr <= 100 else 0.0
     
     # (3) puntuación por contenido GC (máx ->50 %), la da primer3
