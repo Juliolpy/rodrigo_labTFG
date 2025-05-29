@@ -52,12 +52,10 @@ def main() -> None:
         for obj in top_candidates:
             # definimos distancias
             pam_pos = obj._position
-            initial_protospacer = obj._protospacer
             max_lenght = 30
-            initial_lenght = len(initial_protospacer)
-            # para diferentes longitudes de protospacer si el diseño falla
-            primer_data = {"error" : "No se pudieron encontrar primers para estas regiones"}
+            initial_lenght = len(obj._protospacer)
             # dentro del bucle while creamos el candidato al protospacer
+            best_candidate= None
             while initial_lenght <= max_lenght:
                 start_ps = pam_pos - initial_lenght
                 if start_ps < 0:
@@ -65,7 +63,7 @@ def main() -> None:
                 candidate_prot = full_seq[start_ps : pam_pos + 3]
                 flank = 100
                 start = max(0, start_ps - flank)
-                end = min(len(full_seq), pam_pos + 3 + flank)  # 23 = protospacer+PAM
+                end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
                 region = full_seq[start:end]
 
                 try:
@@ -77,14 +75,18 @@ def main() -> None:
                         "score": round(score, 2),
                         "used_prot_len": len(candidate_prot)
                     }
-                    obj._protospacer = candidate_prot
+                    best_candidate = candidate_prot
                     break
+                
                 # si falla le sumamos +1 nt dentro del bucle
                 except Exception:
                     initial_lenght += 1 # vuelve al bucle con 1 nt mas
-
-            primers_for_obj[pam_pos] = primer_data
-
+            if best_candidate:
+                obj._protospacer = best_candidate
+                primers_for_obj[pam_pos] = primer_data
+            else:
+                primer_data = {"error" : "No se pudieron encontrar primers para estas regiones"}
+                primers_for_obj[pam_pos] = primer_data
             # funcion beacon, obj._protospacer actualizado o no
             gRNA = str(obj._protospacer) + tracrRNA
             beacon = design_beacon(obj._protospacer)
