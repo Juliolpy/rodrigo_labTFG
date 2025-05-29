@@ -12,6 +12,17 @@ from .beacon import design_beacon, score_beacon, fold_beacon, beacon_tm, melting
 
 # definimos nuestra funcion parser
 def get_parse() -> argparse.Namespace:
+    """
+    Build and return the command-line argument parser.
+
+    Prepares two arguments:
+      - `fasta` (positional): path to the input FASTA file.
+      - `--output` (optional): one of "json" or "pickle" (default: "json"), 
+        specifying desired output format.
+
+    :return: Parsed arguments namespace.
+    :rtype: argparse.Namespace
+    """
 
     # variable
     parser = argparse.ArgumentParser(description= "esto es un programa para encontrar motivos NGG en secuencias de ADN en virus")
@@ -25,8 +36,21 @@ def get_parse() -> argparse.Namespace:
 # para ejecutar la función de manera manual
 
 def main() -> None:
+    """
+    Main entry point for the Columbo CLI tool.
 
-    # colores y el tracRNA que es siempre el mismo
+    1. Parses command-line arguments.
+    2. Loads sequences from the given FASTA.
+    3. Finds NGG PAM sites in each sequence.
+    4. Builds ColumboParts objects and ranks top candidates.
+    5. Designs molecular beacons and primers around each PAM.
+    6. Writes results to JSON or pickle files.
+    7. Prints a summary report to stdout.
+
+    :raises ValueError: If flanking window around a PAM goes out of sequence bounds.
+    """
+
+    # ANSI colores y el tracRNA que es siempre el mismo
     RED = "\033[91m"
     AZU = "\033[34m"
     CIAN = "\033[96m"
