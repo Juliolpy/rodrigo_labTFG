@@ -10,13 +10,22 @@ import primer3
 # le damos ya los parametros definidos de serie y solo necesitaria la seq y la pam_pos ( un int)
 def primer3_design_columbo(seq: str, pam_pos: int) -> dict:
    """
-   Función que utiliza programa primer3  invocado con subprocess para diseñar primers, toma como input: una secuencia y la posicion del pam
+    Design forward and reverse primers around a CRISPR PAM site using Primer3.
 
-   :param sequence: secuencia a pasar a primer3
-   :type sequence: str
+    This function takes a DNA sequence and the zero-based index of the PAM
+    site, then calls Primer3 to select primers flanking the protospacer region
+    (25 nt upstream + PAM).
 
-   :return: diseño de primers Forward y Reverse para las regiones upstream y downstream del protospacer
-   :rtype: dict
+    :param seq: Full DNA sequence to search for primers.
+    :type seq: str
+    :param pam_pos: Zero-based index of the first base of the PAM motif in `seq`.
+    :type pam_pos: int
+
+    :return: Primer3 raw output dictionary containing primer positions and metrics.
+    :rtype: dict
+
+    :raises ValueError: If `seq` contains no valid bases after cleaning.
+    :raises RuntimeError: When Primer3 fails to find any primer pairs.
    
    """
    # Clean and prepare the sequence
@@ -50,6 +59,22 @@ def primer3_design_columbo(seq: str, pam_pos: int) -> dict:
    return out
 
 def score_primers(output, pam_relative_pos, protospacer_len=25):
+    """
+    Compute a composite score for primer pairs based on distance, GC content, and Tm.
+
+    :param output: Primer3 output dictionary from `primer3_design_columbo`.
+    :type output: dict
+    :param pam_relative_pos: Position of PAM relative to the start of the provided sequence.
+    :type pam_relative_pos: int
+    :param protospacer_len: Length of the protospacer (default 25 nt).
+    :type protospacer_len: int
+
+    :return: Composite score in [0.0, 1.0].
+    :rtype: float
+
+    :raises ValueError: If expected Primer3 keys are missing in `output`.
+
+    """
     # Check if primers were found
     if "PRIMER_LEFT_0" not in output or "PRIMER_RIGHT_0" not in output:
         raise ValueError("No primers found by Primer3 for scoring.")
@@ -82,6 +107,19 @@ def score_primers(output, pam_relative_pos, protospacer_len=25):
     return score_global
 
 def parse_primers_output(output, region):
+    """
+    Extract primer sequences and their complements from Primer3 output.
+
+    :param output: Primer3 output dictionary.
+    :type output: dict
+    :param region: DNA substring used for primer design.
+    :type region: str
+
+    :return: Dictionary with left/right primers and complement/reverse-complement.
+    :rtype: dict
+
+    :raises ValueError: If no primers are found in `output`.
+    """
     # Check if primers were found
     if "PRIMER_LEFT_0" not in output or "PRIMER_RIGHT_0" not in output:
         raise ValueError("No primers found by Primer3 for the given region.")
@@ -101,13 +139,13 @@ def parse_primers_output(output, region):
 
 def output_pimers_json(output: dict) -> dict:
    """
-   Devuelve un archivo json con los objetos creados por primer3_design
+    Write Primer3 output to JSON and load it back.
 
-   :param output: output del programa primer3
-   :type output: dict
+    :param output: Primer3 output dictionary.
+    :type output: dict
 
-   :return: Diccionario en formato .json
-   :rtype: dict
+    :return: Parsed JSON as Python dict.
+    :rtype: dict
    """
    with open("output_PRIMERS.json", "w") as file:
       json.dump(output, file, indent=4)
@@ -117,14 +155,14 @@ def output_pimers_json(output: dict) -> dict:
 
 def output_primers_pickle(output: dict) -> dict:
    """
-   Devuelve un archivo pickle con los objetos creados por primer3_design
-   
-   :param output: output del programa primer3
-   :type output: dict
+    Serialize Primer3 output to a pickle file and reload it.
 
-   :return: Diccionario en formato .pickle
-   :rtype: dict
-   """
+    :param output: Primer3 output dictionary.
+    :type output: dict
+
+    :return: Unpickled Python dict.
+    :rtype: dict
+    """
    with open("output_PRIMERS.pkl", "wb") as file:
       pickle.dump(output, file)
    with open("output_PRIMERS.pkl", "rb") as file:
