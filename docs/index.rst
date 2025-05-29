@@ -14,4 +14,9 @@ documentation for details.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   
+   core
+   beacon
+   primer_design
+   cli
+   # añade aquí más nombres de .rst según los módulos que documentes
