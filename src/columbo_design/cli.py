@@ -169,6 +169,7 @@ def main() -> None:
     porcentaje_éxitos = (numero_éxitos / numero_parts) * 100 if numero_parts else 0.0
     porcentaje_fallas = 100 - porcentaje_éxitos
 
+    # imprimir resultados del output ColumboParts
     for seq_id, pos in NGG_positions.items():
         print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")
         print("  ")
@@ -222,7 +223,7 @@ def main() -> None:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
                 print(f" Score de primers = {YELL}{primer_data['score']:.2f}{RESET}")
             print("-" * 50)
-            
+
     # imprimir resultados
     print("\n\n===== RESUMEN DE BENCHMARKING =====")
     print(f"• Tiempo total de ejecución:\t{total_time:.2f} segundos")
