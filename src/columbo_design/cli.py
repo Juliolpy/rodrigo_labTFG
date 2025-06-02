@@ -4,6 +4,7 @@
 # El fichero cli.py debe importar las funciones de core.py y darle los argumentos adecuados a las mismas
 # para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.
 import argparse
+import time
 from Bio.Seq import Seq
 # importamos las funciones del codigo
 from .core import read_fasta, find_NGG_motivs, process_genome, output_NGG_json, output_NGG_pickle
@@ -62,6 +63,8 @@ def main() -> None:
     tracrRNA = "GUUUUAGAGCUAGAAAUAGCAAGUUAAAAUAAGGCUAGUCCGUUAUCAACUUGAAAAAGUGGCACCGAGUCGGUGCUUUUUU"
     tracrDNA = tracrRNA.upper().replace("U", "T") # Transformamos a DNA para ver complementariedad DNA // DNA
 
+    time_start_total = time.time()
+
     # reclutamos la función get_parse()
     args = get_parse()
 
@@ -72,8 +75,15 @@ def main() -> None:
 
     beacons_for_obj = {}
     primers_for_obj = {}
+    #  -- Datos para el benchmarking -- 
+    columbo_times = []      # lista de tiempos de cada ColumboPart
+    primer_scores = []      # lista de scores obtenidos para cada ColumboPart
+    primer_failure = 0     # cauntas ColumboParts no pudieron diseñar primers
+    total_parts = 0
     for seq_id, seq in sequences.items():
         for obj in top_candidates:
+            part_start = time.time()
+            total_parts += 1
             # definir region alrrederor del PAM para diseñar los primers ( x nt upstream y downstream)
             pam_pos = obj._position
             full_seq = sequences[seq_id] # solo la secuencia del dict
@@ -125,12 +135,24 @@ def main() -> None:
                         "primers": parsed_primers,
                         "score": round(score, 2)
                     }
+                    primer_scores.append(score)  # guardamos el score en la lista
                 except ValueError as exc:
                     # Handle the case where no primers are found for this region
                     primers_for_obj[pam_pos] = {"error": str(exc)}
+                    primer_failure += 1 # contador le añadimos + 1 cada vez que no pueda diseñar primers
             except Exception as exc:
                 # Handle other errors in primer design
                 primers_for_obj[pam_pos] = {"error": str(exc)}
+                part_end = time.time()
+            finally:
+                # Aquí garantizamos que SIN EXCEPCIÓN o NO, midamos el tiempo
+                part_end = time.time()
+                columbo_times.append(part_end - part_start)
+
+    # Al finalizar todos los bucles, medimos tiempo total
+    time_end_total = time.time()
+    total_time = time_end_total - time_start_total  # <-- Métrica (A)
+
     # especificamos el archivo que queremos
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
@@ -140,7 +162,64 @@ def main() -> None:
         json_file = output_NGG_json(top_candidates)
         json_primers = output_pimers_json(primers_for_obj)
         print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
+
+    # --- benchmarking ---
+    numero_parts = total_parts
+    numero_éxitos = numero_parts - primer_failure
+    porcentaje_éxitos = (numero_éxitos / numero_parts) * 100 if numero_parts else 0.0
+    porcentaje_fallas = 100 - porcentaje_éxitos
     # imprimir resultados
+    
+    print("\n\n===== RESUMEN DE BENCHMARKING =====")
+    print(f"• Tiempo total de ejecución:\t{total_time:.2f} segundos")
+    print(f"• Total ColumboParts analizadas:\t{numero_parts}")
+    print(f"• ColumboParts con primers válidos:\t{numero_éxitos} ({porcentaje_éxitos:.1f} %)")
+    print(f"• ColumboParts que fallaron:\t{primer_failure} ({porcentaje_fallas:.1f} %)")
+    if columbo_times:
+        print(f"• Tiempo medio por ColumboPart:\t{sum(columbo_times)/numero_parts:.3f} s")
+        print(f"• Tiempo mínimo:\t{min(columbo_times):.3f} s")
+        print(f"• Tiempo máximo:\t{max(columbo_times):.3f} s")
+
+    # --- (Opcional) Volcar lista de scores y tiempos en disco para análisis posterior ---
+    # Podrías hacer algo como:
+    with open("benchmark_scores.txt", "w") as f:
+        for s in primer_scores:
+            f.write(f"{s:.4f}\n")
+    with open("benchmark_times.txt", "w") as f:
+        for t in columbo_times:
+            f.write(f"{t:.4f}\n")
+
+    # --- Generamos un gráfico desde la CLI ---
+    # Usando matplotlib
+    try:
+        import matplotlib.pyplot as plt
+
+        # 1) Histograma de scores de primers
+        plt.figure(figsize=(6,4))
+        plt.hist(primer_scores, bins=20, edgecolor='black')
+        plt.title("Distribución de Scores de Primers")
+        plt.xlabel("Score")
+        plt.ylabel("Número de ColumboParts")
+        plt.tight_layout()
+        plt.savefig("histograma_scores.png")
+        plt.close()
+
+        # 2) Histograma de tiempos por ColumboPart
+        plt.figure(figsize=(6,4))
+        plt.hist(columbo_times, bins=20, edgecolor='black')
+        plt.title("Distribución de Tiempos por ColumboPart")
+        plt.xlabel("Tiempo (s)")
+        plt.ylabel("Cantidad de ColumboParts")
+        plt.tight_layout()
+        plt.savefig("histograma_tiempos.png")
+        plt.close()
+
+        print("✅ Gráficos guardados: histograma_scores.png, histograma_tiempos.png")
+    except ImportError:
+        print("⚠️ No se pudo generar gráficos: falta instalar matplotlib.")
+
+    print("=================================\n\n")
+
     for seq_id, pos in NGG_positions.items():
         print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")
         print("  ")
@@ -185,7 +264,7 @@ def main() -> None:
             print("                                                          ")
             print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
             print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
-            print(f"                                                                                                                      {AZU}{obj._beacon_site[2:33]}{RESET}")
+            print(f"                                                                                                                      {AZU}{obj._beacon_site[:32]}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
