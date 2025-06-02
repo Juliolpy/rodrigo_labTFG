@@ -168,57 +168,6 @@ def main() -> None:
     numero_éxitos = numero_parts - primer_failure
     porcentaje_éxitos = (numero_éxitos / numero_parts) * 100 if numero_parts else 0.0
     porcentaje_fallas = 100 - porcentaje_éxitos
-    # imprimir resultados
-    
-    print("\n\n===== RESUMEN DE BENCHMARKING =====")
-    print(f"• Tiempo total de ejecución:\t{total_time:.2f} segundos")
-    print(f"• Total ColumboParts analizadas:\t{numero_parts}")
-    print(f"• ColumboParts con primers válidos:\t{numero_éxitos} ({porcentaje_éxitos:.1f} %)")
-    print(f"• ColumboParts que fallaron:\t{primer_failure} ({porcentaje_fallas:.1f} %)")
-    if columbo_times:
-        print(f"• Tiempo medio por ColumboPart:\t{sum(columbo_times)/numero_parts:.3f} s")
-        print(f"• Tiempo mínimo:\t{min(columbo_times):.3f} s")
-        print(f"• Tiempo máximo:\t{max(columbo_times):.3f} s")
-
-    # --- (Opcional) Volcar lista de scores y tiempos en disco para análisis posterior ---
-    # Podrías hacer algo como:
-    with open("benchmark_scores.txt", "w") as f:
-        for s in primer_scores:
-            f.write(f"{s:.4f}\n")
-    with open("benchmark_times.txt", "w") as f:
-        for t in columbo_times:
-            f.write(f"{t:.4f}\n")
-
-    # --- Generamos un gráfico desde la CLI ---
-    # Usando matplotlib
-    try:
-        import matplotlib.pyplot as plt
-
-        # 1) Histograma de scores de primers
-        plt.figure(figsize=(6,4))
-        plt.hist(primer_scores, bins=20, edgecolor='black')
-        plt.title("Distribución de Scores de Primers")
-        plt.xlabel("Score")
-        plt.ylabel("Número de ColumboParts")
-        plt.tight_layout()
-        plt.savefig("histograma_scores.png")
-        plt.close()
-
-        # 2) Histograma de tiempos por ColumboPart
-        plt.figure(figsize=(6,4))
-        plt.hist(columbo_times, bins=20, edgecolor='black')
-        plt.title("Distribución de Tiempos por ColumboPart")
-        plt.xlabel("Tiempo (s)")
-        plt.ylabel("Cantidad de ColumboParts")
-        plt.tight_layout()
-        plt.savefig("histograma_tiempos.png")
-        plt.close()
-
-        print("✅ Gráficos guardados: histograma_scores.png, histograma_tiempos.png")
-    except ImportError:
-        print("⚠️ No se pudo generar gráficos: falta instalar matplotlib.")
-
-    print("=================================\n\n")
 
     for seq_id, pos in NGG_positions.items():
         print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")
@@ -273,6 +222,57 @@ def main() -> None:
                 print(f" Primers diseñados: {MAG}{primer_data['primers']}{RESET}")
                 print(f" Score de primers = {YELL}{primer_data['score']:.2f}{RESET}")
             print("-" * 50)
+            
+    # imprimir resultados
+    print("\n\n===== RESUMEN DE BENCHMARKING =====")
+    print(f"• Tiempo total de ejecución:\t{total_time:.2f} segundos")
+    print(f"• Total ColumboParts analizadas:\t{numero_parts}")
+    print(f"• ColumboParts con primers válidos:\t{numero_éxitos} ({porcentaje_éxitos:.1f} %)")
+    print(f"• ColumboParts que fallaron:\t{primer_failure} ({porcentaje_fallas:.1f} %)")
+    if columbo_times:
+        print(f"• Tiempo medio por ColumboPart:\t{sum(columbo_times)/numero_parts:.3f} s")
+        print(f"• Tiempo mínimo:\t{min(columbo_times):.3f} s")
+        print(f"• Tiempo máximo:\t{max(columbo_times):.3f} s")
+
+    # --- (Opcional) Volcar lista de scores y tiempos en disco para análisis posterior ---
+    # Podrías hacer algo como:
+    with open("benchmark_scores.txt", "w") as f:
+        for s in primer_scores:
+            f.write(f"{s:.4f}\n")
+    with open("benchmark_times.txt", "w") as f:
+        for t in columbo_times:
+            f.write(f"{t:.4f}\n")
+
+    # --- Generamos un gráfico desde la CLI ---
+    # Usando matplotlib
+    try:
+        import matplotlib.pyplot as plt
+
+        # 1) Histograma de scores de primers
+        plt.figure(figsize=(6,4))
+        plt.hist(primer_scores, bins=20, edgecolor='black')
+        plt.title("Distribución de Scores de Primers")
+        plt.xlabel("Score")
+        plt.ylabel("Número de ColumboParts")
+        plt.tight_layout()
+        plt.savefig("histograma_scores.png")
+        plt.close()
+
+        # 2) Histograma de tiempos por ColumboPart
+        plt.figure(figsize=(6,4))
+        plt.hist(columbo_times, bins=20, edgecolor='black')
+        plt.title("Distribución de Tiempos por ColumboPart")
+        plt.xlabel("Tiempo (s)")
+        plt.ylabel("Cantidad de ColumboParts")
+        plt.tight_layout()
+        plt.savefig("histograma_tiempos.png")
+        plt.close()
+
+        print("✅ Gráficos guardados: histograma_scores.png, histograma_tiempos.png")
+    except ImportError:
+        print("⚠️ No se pudo generar gráficos: falta instalar matplotlib.")
+
+    print("=================================\n\n")
 
 # para ejecutar la función como principal y que no de error
 
