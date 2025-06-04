@@ -69,7 +69,7 @@ def score_energy(dG: float, thr: float = -15.0) -> float:
     return strenght / (-thr*2)
 
 # vemos que el hairpin tiene efecticamente 11 nt en stem y 9 en el loop
-def hairpin_correct(struct: str, ideal_stem=11 , ideal_loop:int=9) -> bool: # true or false
+def hairpin_correct(struct: str, ideal_stem=11 , ideal_loop:int=9) -> float: # true or false
     r"""
     Evaluate how close a folded beacon hairpin matches the ideal stem-loop-stem pattern.
 
