@@ -78,7 +78,7 @@ def main() -> None:
     #  -- Datos para el benchmarking -- 
     columbo_times = []      # lista de tiempos de cada ColumboPart
     primer_scores = []      # lista de scores obtenidos para cada ColumboPart
-    primer_failure = 0     # cauntas ColumboParts no pudieron diseñar primers
+    primer_failure = 0     # cuantas ColumboParts no pudieron diseñar primers
     total_parts = 0
     for seq_id, seq in sequences.items():
         for obj in top_candidates:
