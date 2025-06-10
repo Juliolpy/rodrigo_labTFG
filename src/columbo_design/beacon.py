@@ -231,7 +231,7 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
         score *= elements if elements > 0 else 1e-9
         score **= (1.0/len(score_components))
 
-    return score, R_bn, R_gr, F, F_e, hp
+    return score, R_bn, R_gr, F, F_e, hp_correct
 
 
 def design_beacon(beacon_site: str, stem_len:int=11, loop_len:int=9) -> str:
