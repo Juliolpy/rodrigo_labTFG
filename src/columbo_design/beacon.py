@@ -69,7 +69,7 @@ def score_energy(dG: float, thr: float = -15.0) -> float:
     return strenght / (-thr*2)
 
 # vemos que el hairpin tiene efecticamente 11 nt en stem y 9 en el loop
-def hairpin_correct(struct: str, ideal_stem=11 , ideal_loop:int=9) -> float: # true or false
+def hairpin_correct(struct: str, ideal_stem=11 , ideal_loop:int=9) -> float: 
     r"""
     Evaluate how close a folded beacon hairpin matches the ideal stem-loop-stem pattern.
 
@@ -153,6 +153,32 @@ def ratio_complement(seq1: str, seq2: str) -> float:
     matches = sum(1 for a, b in zip(seq1[:min_len], seq2[:min_len]) if base_pair.get(a.upper()) == b.upper())
     return matches / min_len if min_len else 0.0
 
+def penalize_structure_dot_bracket(dot_bracket: str) -> float:
+    """
+    Penaliza estructuras de beacon que no tengan forma clara de hairpin.
+    Estructura ideal: starts with '(((', ends with ')))' y un solo loop central de puntos.
+    """
+
+    # 1. Verificar que empieza con un stem (al menos 3 paréntesis izquierdos)
+    if not dot_bracket.startswith('((('):
+        return 0.0
+
+    # 2. Verificar que termina con un stem (al menos 3 paréntesis derechos)
+    if not dot_bracket.endswith(')))'):
+        return 0.0
+
+    # 3. Verificar que hay **solo un loop** de puntos (p.ej. no puntos sueltos o múltiples bloques)
+    loop_parts = dot_bracket.strip('()').split('.')
+    if len([p for p in loop_parts if p]) > 1:  # más de un bloque de puntos
+        return 0.0
+
+    # 4. Verificar que los puntos estén todos agrupados (loop continuo)
+    if '().' in dot_bracket or '(.()' in dot_bracket:
+        return 0.0
+
+    # Si pasa todos los filtros, se considera válida
+    return 1.0
+
 def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:float=50.0) -> float:
     """
     Compute the overall molecular beacon performance score and its components.
@@ -180,7 +206,8 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
     beacon_region = beacon_site[:len(beacon_seq)]
     struct, beacon_mfe = fold_beacon(beacon_seq)
     hp = hairpin_correct(struct)
-
+    penalization = penalize_structure_dot_bracket(struct)
+    hp_correct = hp * penalization
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
     F = beacon_tm(tm_val, t_min=tm_floor)
