@@ -205,9 +205,9 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
     # 1. Estructura
     beacon_region = beacon_site[:len(beacon_seq)]
     struct, beacon_mfe = fold_beacon(beacon_seq)
-    hp = hairpin_correct(struct)
+    hp_raw = hairpin_correct(struct)
     penalization = penalize_structure_dot_bracket(struct)
-    hp_correct = hp * penalization
+    hp = hp_raw * penalization
     # 2. Tm
     tm_val = mt.Tm_NN(beacon_seq)
     F = beacon_tm(tm_val, t_min=tm_floor)
@@ -231,7 +231,7 @@ def score_beacon(beacon_seq: str, beacon_site: str, gRNA_seq: str ,tm_floor:floa
         score *= elements if elements > 0 else 1e-9
         score **= (1.0/len(score_components))
 
-    return score, R_bn, R_gr, F, F_e, hp_correct
+    return score, R_bn, R_gr, F, F_e, hp
 
 
 def design_beacon(beacon_site: str, stem_len:int=11, loop_len:int=9) -> str:
