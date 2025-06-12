@@ -156,11 +156,11 @@ def main() -> None:
     # especificamos el archivo que queremos
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
-        pickle_primers = output_primers_pickle(primers_for_obj)
+        pickle_primers = output_primers_pickle(raw_output)
         print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
     else:
         json_file = output_NGG_json(top_candidates)
-        json_primers = output_pimers_json(primers_for_obj)
+        json_primers = output_pimers_json(raw_output)
         print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
 
     # --- benchmarking ---
@@ -214,7 +214,7 @@ def main() -> None:
             print("                                                          ")
             print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
             print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
-            print(f"                                                                                                                      {AZU}{obj._beacon_site[:32]}{RESET}")
+            print(f"                                                                                                                      {AZU}{obj._beacon_site[:30]}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
