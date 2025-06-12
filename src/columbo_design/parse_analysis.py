@@ -1,6 +1,6 @@
 import argparse
-from core import read_fasta 
-from dna_analysis_2 import search_restriction_sites
+from .core import read_fasta 
+from .dna_analysis_2 import search_restriction_sites
 
 # para analizar un fasta y decir si tiene secuencias de restricción
 
@@ -45,7 +45,7 @@ def main() -> None:
 
 
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
 
     

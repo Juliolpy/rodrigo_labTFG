@@ -45,49 +45,53 @@ def main() -> None:
     top_candidates = process_genome(sequences, NGG_positions) # vemos cuales son los resultados de la clase y los almacenamos en la variable top_candidates
 
     # definimos distancias
+    max_protospacer_lenght = 30
+    initial_protospacer_lenght = 23 # Protospacer + PAM
+
     beacons_for_obj = {}
     primers_for_obj = {}
     for seq_id, seq in sequences.items():
-        full_seq = sequences[seq_id] # posicion del pam y la secuencia completa
         for obj in top_candidates:
-            # definimos distancias
+            # posicion del pam y la secuencia completa
             pam_pos = obj._position
-            max_lenght = 30
-            initial_lenght = len(obj._protospacer)
-            # dentro del bucle while creamos el candidato al protospacer
-            best_candidate= None
-            while initial_lenght <= max_lenght:
-                start_ps = pam_pos - initial_lenght
+            full_seq = sequences[seq_id] # solo la secuencia del dict
+            # para diferentes longitudes de protospacer si el diseño falla
+            prot_len = initial_protospacer_lenght
+            primers_ok = False
+            primer_data = {"error" : "No se pudieron encontrar primers para estas regiones"}
+
+            while not primers_ok and prot_len <= max_protospacer_lenght:
+                start_ps = pam_pos - prot_len
                 if start_ps < 0:
                     break
-                candidate_prot = full_seq[start_ps : pam_pos + 3]
+                new_protospacer = full_seq[start_ps: pam_pos + 3]
+                 # controlar los bordes del genoma
                 flank = 100
                 start = max(0, start_ps - flank)
-                end = min(len(full_seq), pam_pos + 23 + flank)  # 23 = protospacer+PAM
+                end = min(len(full_seq), pam_pos + 3 + flank)  # 23 = protospacer+PAM
                 region = full_seq[start:end]
 
                 try:
                     raw_output = primer3_design_columbo(region, pam_pos - start)
                     parsed_primers = parse_primers_output(raw_output, region)
-                    score = score_primers(raw_output, pam_pos-start, protospacer_len=len(candidate_prot))
+                    score = score_primers(raw_output, pam_pos-start, protospacer_len=len(new_protospacer))
                     primer_data = {
                         "primers": parsed_primers,
                         "score": round(score, 2),
-                        "used_prot_len": len(candidate_prot)
+                        "used_prot_len": prot_len
                     }
-                    best_candidate = candidate_prot
-                    break
-                
-                # si falla le sumamos +1 nt dentro del bucle
+                    primers_ok = True
+                # except ValueError as exc:
+                    # Handle the case where no primers are found for this region
+                    # primers_for_obj[pam_pos] = {"error": str(exc)}
                 except Exception:
-                    initial_lenght += 1 # vuelve al bucle con 1 nt mas
-            if best_candidate:
-                obj._protospacer = best_candidate
-                primers_for_obj[pam_pos] = primer_data
-            else:
-                primer_data = {"error" : "No se pudieron encontrar primers para estas regiones"}
-                primers_for_obj[pam_pos] = primer_data
-            # funcion beacon, obj._protospacer actualizado o no
+                # Handle other errors in primer design
+                # primers_for_obj[pam_pos] = {"error": str(exc)}
+                    prot_len += 1
+
+            primers_for_obj[pam_pos] = primer_data
+
+            # funcion beacon
             gRNA = str(obj._protospacer) + tracrRNA
             beacon = design_beacon(obj._protospacer)
             beacon_struct = fold_beacon(beacon)
@@ -95,7 +99,7 @@ def main() -> None:
             beacon_tm_score = beacon_tm(beacon_melting)
             beacon_score, R_bn, R_gr, F_tm = score_beacon(beacon, obj._protospacer, gRNA)
         
-            beacons_for_obj[pam_pos] = {
+            beacons_for_obj[obj._position] = {
             "beacon":          beacon,
             "beacon_struct":   beacon_struct,
             "tm":              beacon_melting,
@@ -106,15 +110,15 @@ def main() -> None:
             "F_tm":            F_tm,
             }
 
-        # especificamos el archivo que queremos
-        if args.output == "pickle":
-            pickle_file = output_NGG_pickle(top_candidates)
-            pickle_primers = output_primers_pickle(raw_output)
-            print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
-        else:
-            json_file = output_NGG_json(top_candidates)
-            json_primers = output_pimers_json(raw_output)
-            print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
+    # especificamos el archivo que queremos
+    if args.output == "pickle":
+        pickle_file = output_NGG_pickle(top_candidates)
+        pickle_primers = output_primers_pickle(raw_output)
+        print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
+    else:
+        json_file = output_NGG_json(top_candidates)
+        json_primers = output_pimers_json(raw_output)
+        print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
     # imprimir resultados
     for seq_id, pos in NGG_positions.items():
         print(f"La Secuencia correspondiente con nombre: {YELL}{seq_id}{RESET}, tiene {YELL}{len(pos)}{RESET} motivos NGG en las posiciones:")

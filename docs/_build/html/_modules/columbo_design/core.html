@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>columbo_design.core &mdash; Columbo Design 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Columbo Design
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Columbo Design</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">columbo_design.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for columbo_design.core</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Lean los contenidos de un fichero fasta.</span>
+<span class="c1"># Localicen las posiciones dentro de la secuencia donde tengamos NGG (recuerda que Nsignifica cualquier base).</span>
+<span class="c1"># Devuelvan esas posiciones.</span>
+
+<span class="c1"># para calcular la melting temperature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.SeqUtils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeltingTemp</span> <span class="k">as</span> <span class="n">mt</span> <span class="c1"># mt es la función de la herramienta meltingtemp dentro del modulo sequtils de BIO</span>
+<span class="c1"># importamos el modulo sys y Seq de Biopython</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.Seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio</span><span class="w"> </span><span class="kn">import</span> <span class="n">SeqIO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="c1"># colores para que uno se pueda aclarar</span>
+<span class="n">RED</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[91m&quot;</span>
+<span class="n">CIAN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[96m&quot;</span>
+<span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[92m&quot;</span>
+<span class="n">GR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[92m&quot;</span>
+<span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+<span class="n">MAG</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[35m&quot;</span>
+<span class="n">YELL</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[33m&quot;</span>
+
+<span class="c1"># crea una CLASE para hacer un RAISE para crear excepciones</span>
+<div class="viewcode-block" id="Out_of_frame_ERROR">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.Out_of_frame_ERROR">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Out_of_frame_ERROR</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Exception raised when a PAM or protospacer falls outside the bounds of the sequence.</span>
+
+<span class="sd">   :param message: Error message to display</span>
+<span class="sd">   :type message: str</span>
+
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mensaje</span> <span class="o">=</span> <span class="s2">&quot;El PAM o Protospacer no tienen el tamaño mínimo requerido&quot;</span><span class="p">):</span>
+      <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mensaje</span><span class="p">)</span> <span class="c1"># El método super() en Python se usa para llamar a métodos de la superclase (clase padre) desde una subclase.</span></div>
+
+      <span class="c1"># si no pusieras super, Exception no sabe que existe mensaje, porque nunca lo pasamos a Exception</span>
+
+<span class="c1"># vamos a definir la clase ColumboParts   </span>
+<div class="viewcode-block" id="ColumboParts">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ColumboParts</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Represents a CRISPR-Cas9 protospacer candidate (Columbo part). Stores sequence, scores, and melting temperature.</span>
+
+<span class="sd">   :param sequence: Full DNA sequence as a Biopython Seq object</span>
+<span class="sd">   :type sequence: Seq</span>
+<span class="sd">   :param position: Zero-based index of the PAM start (NGG) within `sequence`</span>
+<span class="sd">   :type position: int</span>
+
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="n">Seq</span><span class="p">,</span> <span class="n">position</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span> 
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Initialize a ColumboParts instance. Validates PAM and protospacer frame and computes scores.</span>
+
+<span class="sd">      :raises OutOfFrameError: If PAM or protospacer exceed sequence boundaries or invalid PAM</span>
+<span class="sd">      :raises TypeError: If incorrect types are passed</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">if</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+         <span class="c1"># saca por pantalla el error de la clase definida arriba</span>
+         <span class="k">raise</span> <span class="n">Out_of_frame_ERROR</span><span class="p">(</span><span class="s2">&quot;El PAM no puede calcularse porque se excede la longitud de la secuencia&quot;</span><span class="p">)</span>
+      <span class="n">pam</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">position</span> <span class="p">:</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="n">pam</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span> <span class="ow">and</span> <span class="n">pam</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span>
+         <span class="k">raise</span> <span class="n">Out_of_frame_ERROR</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PAM inválido en la posicion </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> no tiene estructura NGG &quot;</span><span class="p">)</span> <span class="c1"># descartar PAM inválidos</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_pam</span> <span class="o">=</span> <span class="n">pam</span>
+      <span class="c1"># si la posicion es menor de 20</span>
+      <span class="k">if</span> <span class="n">position</span> <span class="o">&lt;</span> <span class="mi">25</span><span class="p">:</span> 
+         <span class="c1"># saca por pantalla el error definido en la clase de arriba</span>
+         <span class="k">raise</span> <span class="n">Out_of_frame_ERROR</span><span class="p">(</span><span class="s2">&quot;El protospacer no tiene el tamaño requerido --&gt; 20 nt upstream PAM&quot;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">position</span> <span class="o">-</span> <span class="mi">25</span> <span class="p">:</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_beacon_site</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">position</span> <span class="o">-</span> <span class="mi">50</span><span class="p">:</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">position</span> <span class="o">-</span> <span class="mi">150</span><span class="p">:</span> <span class="n">position</span> <span class="o">+</span> <span class="mi">70</span><span class="p">]</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">position</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calcular_scores</span> <span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_score_medio</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scores</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scores</span> <span class="k">else</span> <span class="mi">0</span> <span class="c1"># basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calcular_tm</span><span class="p">()</span>
+   
+   <span class="c1"># redefinimos todos los atributos usando @property</span>
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">beacon_site</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Seq</span><span class="p">:</span> <span class="c1"># SITIO DE UNIÓN BEACON</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Sequence region used for beacon design (50 nt upstream + PAM).</span>
+
+<span class="sd">      :return: Beacon site sequence</span>
+<span class="sd">      :rtype: Seq</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_beacon_site</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">region</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Seq</span><span class="p">:</span> <span class="c1"># REGION</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Flanking region around protospacer (200 nt upstream to 300 nt downstream).</span>
+
+<span class="sd">      :return: Sequence region</span>
+<span class="sd">      :rtype: Seq</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">pam</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Seq</span><span class="p">:</span> <span class="c1"># PAM</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      PAM sequence (3 nt NGG).</span>
+
+<span class="sd">      :return: PAM sequence</span>
+<span class="sd">      :rtype: Seq</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pam</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># POSITION</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Position of PAM within the original sequence.</span>
+
+<span class="sd">      :return: Zero-based index of PAM</span>
+<span class="sd">      :rtype: int</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_position</span>
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">protospacer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Seq</span><span class="p">:</span> <span class="c1"># PROTOSPACER</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Protospacer sequence (25 nt + PAM).</span>
+
+<span class="sd">      :return: Protospacer</span>
+<span class="sd">      :rtype: Seq</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">scores</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> <span class="c1">#SCORE</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Mean score across all features.</span>
+
+<span class="sd">      :return: Average score</span>
+<span class="sd">      :rtype: float</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scores</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">score_medio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>  <span class="c1">#SCORE_MEDIO</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      List of individual feature scores [gc_content, no_G_before_pam, no_T_2_upstream, no_homopolymer].</span>
+
+<span class="sd">      :return: Individual scores</span>
+<span class="sd">      :rtype: list[int]</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score_medio</span>
+   
+   <span class="nd">@property</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">tm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>  <span class="c1"># TM</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Melting temperature of the protospacer (in °C).</span>
+
+<span class="sd">      :return: Melting temperature</span>
+<span class="sd">      :rtype: float</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tm</span>
+      
+   <span class="c1"># Funciones separadas</span>
+<div class="viewcode-block" id="ColumboParts.calc_1">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calc_1">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calc_1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># 1</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Score 1: 1 if GC content of protospacer &lt; 80%, else 0.</span>
+
+<span class="sd">      :return: 1 or 0</span>
+<span class="sd">      :rtype: int</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">score_1</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.8</span> <span class="k">else</span> <span class="mi">0</span>
+      <span class="k">return</span> <span class="n">score_1</span> <span class="c1"># primer score</span></div>
+
+   
+<div class="viewcode-block" id="ColumboParts.calc_2">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calc_2">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calc_2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># 2</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Score 2: 1 if the base immediately upstream of PAM is not &#39;G&#39;, else 0.</span>
+
+<span class="sd">      :return: 1 or 0</span>
+<span class="sd">      :rtype: int</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">score_2</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;G&quot;</span> <span class="k">else</span> <span class="mi">1</span>
+      <span class="k">return</span> <span class="n">score_2</span> <span class="c1"># segundo score</span></div>
+
+   
+<div class="viewcode-block" id="ColumboParts.calc_3">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calc_3">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calc_3</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># 3</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Score 3: 1 if the base two positions upstream of PAM is not &#39;T&#39;, else 0.</span>
+
+<span class="sd">      :return: 1 or 0</span>
+<span class="sd">      :rtype: int</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">score_3</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;T&quot;</span> <span class="k">else</span> <span class="mi">0</span>
+      <span class="k">return</span> <span class="n">score_3</span> <span class="c1"># tercer score</span></div>
+
+   
+<div class="viewcode-block" id="ColumboParts.calc_4">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calc_4">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calc_4</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span> <span class="c1"># 4</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Score 4: 1 if no homopolymer triplet (AAA, CCC, GGG, TTT), else 0.</span>
+
+<span class="sd">      :return: 1 or 0</span>
+<span class="sd">      :rtype: int</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">score_4</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="mi">3</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="s2">&quot;ATCG&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+      <span class="k">return</span> <span class="n">score_4</span> <span class="c1"># cuarto score</span></div>
+
+   
+
+   <span class="c1"># definimos la función del score_global</span>
+<div class="viewcode-block" id="ColumboParts.calcular_scores">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calcular_scores">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calcular_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span> <span class="c1"># GLOBAL</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Compute all four individual scores.</span>
+
+<span class="sd">      :return: List of four scores</span>
+<span class="sd">      :rtype: list[int]</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">score_list</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_1</span><span class="p">()</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_2</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_3</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_4</span><span class="p">()]</span> <span class="c1"># recuerda usar () para ejecutar las funciones</span>
+      <span class="k">return</span> <span class="n">score_list</span></div>
+
+    
+   <span class="c1"># Función para calcular la temperatura de melting del protospacer</span>
+<div class="viewcode-block" id="ColumboParts.calcular_tm">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.calcular_tm">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">calcular_tm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Compute melting temperature using nearest-neighbor method.</span>
+
+<span class="sd">      :return: Melting temperature in °C</span>
+<span class="sd">      :rtype: float</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">melting</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">Tm_NN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protospacer</span> <span class="k">else</span> <span class="mi">0</span> <span class="c1"># para calcular la tm del protospcaer</span>
+      <span class="k">return</span> <span class="n">melting</span></div>
+
+   
+   <span class="c1"># transformar el self en diccionairo para qeu pueda ser transfomrado en json</span>
+<div class="viewcode-block" id="ColumboParts.to_dict">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.to_dict">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Serialize instance to a dictionary.</span>
+
+<span class="sd">     :return: Dict with keys [&#39;PAM&#39;,&#39;Protospacer&#39;,&#39;Position&#39;,&#39;Scores&#39;,&#39;Score_medio&#39;,&#39;Tm&#39;]</span>
+<span class="sd">     :rtype: dict</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
+     <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;PAM&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pam</span><span class="p">,</span>
+        <span class="s2">&quot;Protospacer&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protospacer</span><span class="p">,</span>     <span class="c1"># añadido el underscore</span>
+        <span class="s2">&quot;Position&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">,</span>
+        <span class="s2">&quot;Scores&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">,</span>
+        <span class="s2">&quot;Score_medio&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_medio</span><span class="p">,</span>
+        <span class="s2">&quot;Tm&quot;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tm</span>
+     <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ColumboParts.to_json">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.to_json">[docs]</a>
+   <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Serialize instance to JSON string.</span>
+
+<span class="sd">      :return: JSON representation</span>
+<span class="sd">      :rtype: str</span>
+<span class="sd"> </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span> <span class="c1"># json lee los datos y los almacena</span></div>
+
+   
+<div class="viewcode-block" id="ColumboParts.from_parts">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.from_parts">[docs]</a>
+   <span class="nd">@classmethod</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">from_parts</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Reconstruct ColumboParts from a dict of properties.</span>
+
+<span class="sd">      :param sequence: Original full sequence</span>
+<span class="sd">      :type sequence: Seq</span>
+<span class="sd">      :param data: Dict with keys matching to_dict()</span>
+<span class="sd">      :type data: dict</span>
+<span class="sd">      :return: New ColumboParts instance</span>
+<span class="sd">      :rtype: ColumboParts</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;Position&quot;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="ColumboParts.from_json">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.ColumboParts.from_json">[docs]</a>
+   <span class="nd">@classmethod</span>
+   <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">json_str</span><span class="p">):</span> <span class="c1"># cls en vez de self</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Reconstruct ColumboParts from a JSON string.</span>
+
+<span class="sd">      :param sequence: Original full sequence</span>
+<span class="sd">      :type sequence: Seq</span>
+<span class="sd">      :param json_str: JSON string as produced by to_json()</span>
+<span class="sd">      :type json_str: str</span>
+<span class="sd">      :return: New ColumboParts instance</span>
+<span class="sd">      :rtype: ColumboParts</span>
+
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
+      <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_parts</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+</div>
+
+
+<span class="c1"># estas funciones behind the musgo, fuera de la clase</span>
+<div class="viewcode-block" id="read_fasta">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.read_fasta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_fasta</span><span class="p">(</span><span class="n">fastafile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Read a FASTA file into a dict of clean DNA sequences.</span>
+
+<span class="sd">   :param fastafile: Path to FASTA file</span>
+<span class="sd">   :type fastafile: str</span>
+<span class="sd">   :return: Dict mapping record IDs to uppercase ATCG-only strings</span>
+<span class="sd">   :rtype: dict[str, str]</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   
+   <span class="n">seq_name</span> <span class="o">=</span> <span class="p">{}</span>
+   <span class="c1"># nombre y secuencia</span>
+   <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fastafile</span><span class="p">,</span> <span class="s2">&quot;fasta&quot;</span><span class="p">):</span>
+      <span class="n">clean_seq</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^ATCG]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span> <span class="c1"># limpiamos secuencia</span>
+      <span class="n">seq_name</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">clean_seq</span>
+   <span class="k">return</span> <span class="n">seq_name</span></div>
+
+
+<div class="viewcode-block" id="find_NGG_motivs">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.find_NGG_motivs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_NGG_motivs</span><span class="p">(</span><span class="n">seq_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Find all NGG PAM motifs in each sequence.</span>
+
+<span class="sd">   :param sequences: Dict of ID -&gt; sequence</span>
+<span class="sd">   :type sequences: dict</span>
+<span class="sd">   :return: Dict of ID -&gt; list of zero-based PAM start positions</span>
+<span class="sd">   :rtype: dict[str, list[int]]</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="c1"># diccionario donde guardamos las posiciones de los motivos NGG</span>
+   <span class="n">motifs</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># seq_nombre = número de motivos</span>
+
+   <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">seq_name</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="c1"># esta línea: i + 1 for i in range(len(seq)-2) --&gt; hace que no nos salgamos del indice </span>
+      <span class="n">motifs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">seq</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;GG&quot;</span><span class="p">]</span> <span class="c1"># Si es un motivo NGG en la sencuenia</span>
+      <span class="n">motifs</span><span class="p">[</span><span class="n">seq_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">motifs_list</span>
+   <span class="k">return</span> <span class="n">motifs</span>  </div>
+
+
+<div class="viewcode-block" id="process_genome">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.process_genome">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_genome</span><span class="p">(</span><span class="n">seq_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">motifs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Build ColumboParts for each valid PAM and return top 20 by average score.</span>
+
+<span class="sd">   :param sequences: Dict of ID -&gt; sequence</span>
+<span class="sd">   :param motifs: Dict of ID -&gt; list of PAM positions</span>
+<span class="sd">   :return: Top 20 ColumboParts instances, sorted by score_medio descending</span>
+<span class="sd">   :rtype: list[ColumboParts]</span>
+<span class="sd">   </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">columbo_list</span> <span class="o">=</span> <span class="p">[]</span>
+   <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">positions</span> <span class="ow">in</span> <span class="n">motifs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+      <span class="n">sequence</span> <span class="o">=</span> <span class="n">seq_name</span><span class="p">[</span><span class="n">seq_id</span><span class="p">]</span>
+      <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+         <span class="c1"># ya que el protospacer no puede ser menor de 20, nuestro codigo no funcionaria: index out of range</span>
+         <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="mi">25</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+            <span class="n">columbo_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ColumboParts</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span> <span class="c1"># objeto seq y un int</span>
+         <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RED</span><span class="si">}</span><span class="s2"> ⚠️ [WARNING]⚠️ </span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> posición </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">pos</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> descartada en </span><span class="si">{</span><span class="n">CIAN</span><span class="si">}{</span><span class="n">seq_id</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">RED</span><span class="si">}{</span><span class="n">Out_of_frame_ERROR</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+   <span class="c1"># ahora para quedarnos con los 20 mejores solo</span>
+   <span class="n">columbo_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">score_medio</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">columbo_list</span><span class="p">[:</span><span class="mi">20</span><span class="p">]</span></div>
+
+ 
+<div class="viewcode-block" id="output_NGG_json">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.output_NGG_json">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">output_NGG_json</span><span class="p">(</span><span class="n">motifs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>  <span class="c1">#JSON</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Write top ColumboParts to output_NGG.json and return list of dicts.</span>
+
+<span class="sd">      :param parts: List of ColumboParts</span>
+<span class="sd">      :type parts: list</span>
+<span class="sd">      :return: List of serialized dicts</span>
+<span class="sd">      :rtype: list[dict]</span>
+<span class="sd">      </span>
+<span class="sd">      &quot;&quot;&quot;</span>
+   <span class="c1"># guardamos los datos en json en file</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_NGG.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">([</span><span class="n">obj</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">motifs</span><span class="p">],</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+      <span class="c1"># los leemos y cargamos</span>
+      <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_NGG.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span> <span class="c1"># los cargamos, no hace falta return </span>
+         <span class="n">json_positions</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="output_NGG_pickle">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.core.output_NGG_pickle">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">output_NGG_pickle</span><span class="p">(</span><span class="n">motifs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>    <span class="c1"># PICKLE</span>
+<span class="w">   </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Write top ColumboParts to output_NGG.pkl and return list of dicts.</span>
+
+<span class="sd">   :param parts: List of ColumboParts</span>
+<span class="sd">   :type parts: list</span>
+<span class="sd">   :return: List of serialized dicts</span>
+<span class="sd">   :rtype: list[dict]</span>
+<span class="sd">      </span>
+<span class="sd">   &quot;&quot;&quot;</span>
+
+    <span class="c1"># guardamos los datos en pickle en file</span>
+   <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_NGG.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">([</span><span class="n">obj</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">motifs</span><span class="p">],</span> <span class="n">file</span><span class="p">)</span>
+   <span class="c1"># los leemos y cargamos</span>
+   <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output_NGG.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">pickle_positions</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Julio &lt;jcochenta@gmail.com&gt;, luksgrin &lt;lucas.goiriz@csic.es&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

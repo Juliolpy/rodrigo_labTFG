@@ -1,0 +1,1181 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>columbo_design package &mdash; Columbo Design 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview" href="overview.html" />
+    <link rel="prev" title="src" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Columbo Design
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">columbo_design package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.beacon">columbo_design.beacon module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.beacon_tm"><code class="docutils literal notranslate"><span class="pre">beacon_tm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.count_hairpin"><code class="docutils literal notranslate"><span class="pre">count_hairpin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.design_beacon"><code class="docutils literal notranslate"><span class="pre">design_beacon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.fold_beacon"><code class="docutils literal notranslate"><span class="pre">fold_beacon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.hairpin_correct"><code class="docutils literal notranslate"><span class="pre">hairpin_correct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.hybridation_energy"><code class="docutils literal notranslate"><span class="pre">hybridation_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.melting_temperature"><code class="docutils literal notranslate"><span class="pre">melting_temperature()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.penalize_structure_dot_bracket"><code class="docutils literal notranslate"><span class="pre">penalize_structure_dot_bracket()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.ratio_complement"><code class="docutils literal notranslate"><span class="pre">ratio_complement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.score_beacon"><code class="docutils literal notranslate"><span class="pre">score_beacon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.beacon.score_energy"><code class="docutils literal notranslate"><span class="pre">score_energy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.calculator">columbo_design.calculator module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.calculator.get_parse"><code class="docutils literal notranslate"><span class="pre">get_parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.calculator.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.cli">columbo_design.cli module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.cli.get_parse"><code class="docutils literal notranslate"><span class="pre">get_parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.cli_2">columbo_design.cli_2 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.cli_2.get_parse"><code class="docutils literal notranslate"><span class="pre">get_parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.cli_2.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.core">columbo_design.core module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.ColumboParts"><code class="docutils literal notranslate"><span class="pre">ColumboParts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.Out_of_frame_ERROR"><code class="docutils literal notranslate"><span class="pre">Out_of_frame_ERROR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.find_NGG_motivs"><code class="docutils literal notranslate"><span class="pre">find_NGG_motivs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.output_NGG_json"><code class="docutils literal notranslate"><span class="pre">output_NGG_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.output_NGG_pickle"><code class="docutils literal notranslate"><span class="pre">output_NGG_pickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.process_genome"><code class="docutils literal notranslate"><span class="pre">process_genome()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.core.read_fasta"><code class="docutils literal notranslate"><span class="pre">read_fasta()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.data_storage">columbo_design.data_storage module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.data_storage.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.data_storage.read_json"><code class="docutils literal notranslate"><span class="pre">read_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.data_storage.read_pickle"><code class="docutils literal notranslate"><span class="pre">read_pickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.data_storage.save_json"><code class="docutils literal notranslate"><span class="pre">save_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.data_storage.save_pickle"><code class="docutils literal notranslate"><span class="pre">save_pickle()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.dna_analysis">columbo_design.dna_analysis module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.dna_analysis.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.dna_analysis.search_restriction_sites"><code class="docutils literal notranslate"><span class="pre">search_restriction_sites()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.dna_analysis_2">columbo_design.dna_analysis_2 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.dna_analysis_2.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.dna_analysis_2.search_restriction_sites"><code class="docutils literal notranslate"><span class="pre">search_restriction_sites()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.issue_2">columbo_design.issue_2 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.issue_4_2">columbo_design.issue_4_2 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.issue_4_2.vienna_RNA"><code class="docutils literal notranslate"><span class="pre">vienna_RNA()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.json_pickle">columbo_design.json_pickle module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.json_pickle.klkmanin"><code class="docutils literal notranslate"><span class="pre">klkmanin()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.modsum">columbo_design.modsum module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.modsum.modsum"><code class="docutils literal notranslate"><span class="pre">modsum()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.parse_analysis">columbo_design.parse_analysis module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.parse_analysis.get_args"><code class="docutils literal notranslate"><span class="pre">get_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.parse_analysis.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.primer_design">columbo_design.primer_design module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.primer_design.output_pimers_json"><code class="docutils literal notranslate"><span class="pre">output_pimers_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.primer_design.output_primers_pickle"><code class="docutils literal notranslate"><span class="pre">output_primers_pickle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.primer_design.parse_primers_output"><code class="docutils literal notranslate"><span class="pre">parse_primers_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.primer_design.primer3_design_columbo"><code class="docutils literal notranslate"><span class="pre">primer3_design_columbo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#columbo_design.primer_design.score_primers"><code class="docutils literal notranslate"><span class="pre">score_primers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design.prueba">columbo_design.prueba module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-columbo_design">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Columbo Design</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">columbo_design package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/columbo_design.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="columbo-design-package">
+<h1>columbo_design package<a class="headerlink" href="#columbo-design-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-columbo_design.beacon">
+<span id="columbo-design-beacon-module"></span><h2>columbo_design.beacon module<a class="headerlink" href="#module-columbo_design.beacon" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.beacon_tm">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">beacon_tm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">45.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#beacon_tm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.beacon_tm" title="Link to this definition"></a></dt>
+<dd><p>Activation function for melting temperature: maps Tm to [0,1].</p>
+<p>0 if tm &lt; t_floor, linearly increases to 1 at tm &gt;= t_min.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tm</strong> (<em>float</em>) – melting temperature in °C</p></li>
+<li><p><strong>t_min</strong> (<em>float</em>) – temperature at which score == 1.0</p></li>
+<li><p><strong>t_floor</strong> (<em>float</em>) – temperature below which score == 0.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normalized Tm score between 0 and 1</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.count_hairpin">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">count_hairpin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/beacon.html#count_hairpin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.count_hairpin" title="Link to this definition"></a></dt>
+<dd><p>Count stem1, loop, and stem2 lengths in a dot-bracket structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>struct</strong> (<em>str</em>) – RNA secondary structure in dot-bracket</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple (stem1_length, loop_length, stem2_length)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(int, int, int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.design_beacon">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">design_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beacon_site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stem_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#design_beacon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.design_beacon" title="Link to this definition"></a></dt>
+<dd><p>Design a DNA molecular beacon sequence from a target site.</p>
+<dl class="simple">
+<dt>Beacon = [stem1 | loop | stem2], where:</dt><dd><ul class="simple">
+<li><p>stem1 = first stem_len nt of the displaced strand reverse</p></li>
+<li><p>loop   = complementary of central region</p></li>
+<li><p>stem2 = inverse complement of stem1</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beacon_site</strong> (<em>str</em>) – target region sequence (displaced strand)</p></li>
+<li><p><strong>stem_len</strong> (<em>int</em>) – length of each stem arm</p></li>
+<li><p><strong>loop_len</strong> (<em>int</em>) – length of the loop (unused, inferred from site)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>designed beacon DNA sequence</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.fold_beacon">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">fold_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#fold_beacon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.fold_beacon" title="Link to this definition"></a></dt>
+<dd><p>Fold a DNA beacon sequence into its RNA secondary structure and compute its minimum free energy (MFE).</p>
+<p>This function converts the input DNA sequence to RNA by replacing Ts with Us, then uses ViennaRNA
+to calculate the secondary structure in dot-bracket notation and the associated MFE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – DNA sequence of the beacon</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple containing the secondary structure (dot-bracket) and its MFE in kcal/mol</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.hairpin_correct">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">hairpin_correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_stem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ideal_loop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#hairpin_correct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.hairpin_correct" title="Link to this definition"></a></dt>
+<dd><p>Evaluate how close a folded beacon hairpin matches the ideal stem-loop-stem pattern.</p>
+<p>The function checks the lengths of the initial run of ‘(’ (stem1),
+the central run of ‘.’ (loop), and the final run of ‘)’ (stem2). Each is normalized
+by its ideal length and averaged to produce a score in [0,1].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>struct</strong> (<em>str</em>) – RNA secondary structure in dot-bracket notation</p></li>
+<li><p><strong>ideal_stem</strong> (<em>int</em>) – ideal number of base pairs in each stem</p></li>
+<li><p><strong>ideal_loop</strong> (<em>int</em>) – ideal number of unpaired bases in the loop</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>average normalized score of (stem1, loop, stem2)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.hybridation_energy">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">hybridation_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beacon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#hybridation_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.hybridation_energy" title="Link to this definition"></a></dt>
+<dd><p>Compute the hybridization free energy between a beacon and its target sequence.</p>
+<p>Both input sequences are first converted to RNA (T -&gt; U) before calling RNA.duplexfold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beacon</strong> (<em>str</em>) – DNA sequence of the beacon</p></li>
+<li><p><strong>target</strong> (<em>str</em>) – DNA sequence of the target (complementary displaced strand)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>hybridization energy ΔG in kcal/mol (negative value indicates favorable binding)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.melting_temperature">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">melting_temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#melting_temperature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.melting_temperature" title="Link to this definition"></a></dt>
+<dd><p>Calculate the DNA melting temperature (Tm) of a sequence using nearest-neighbor thermodynamics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seq</strong> (<em>str</em>) – nucleotide sequence (DNA or RNA)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>melting temperature in °C</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.penalize_structure_dot_bracket">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">penalize_structure_dot_bracket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dot_bracket</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#penalize_structure_dot_bracket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.penalize_structure_dot_bracket" title="Link to this definition"></a></dt>
+<dd><p>Penaliza estructuras de beacon que no tengan forma clara de hairpin.
+Estructura ideal: starts with ‘(((’, ends with ‘)))’ y un solo loop central de puntos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dot_bracket</strong> (<em>str</em>) – dot_bracket representation of the folding beacon sequence</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>score based on penalization of beacon structure</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.ratio_complement">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">ratio_complement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#ratio_complement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.ratio_complement" title="Link to this definition"></a></dt>
+<dd><p>Compute the fraction of complementary base pairs (A-T, G-C) between two aligned sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq1</strong> (<em>str</em>) – first nucleotide sequence</p></li>
+<li><p><strong>seq2</strong> (<em>str</em>) – second nucleotide sequence</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>fraction of positions with canonical complementarity</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.score_beacon">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">score_beacon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beacon_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beacon_site</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gRNA_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#score_beacon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.score_beacon" title="Link to this definition"></a></dt>
+<dd><p>Compute the overall molecular beacon performance score and its components.</p>
+<dl class="simple">
+<dt>Combines:</dt><dd><ol class="arabic simple">
+<li><p>hairpin structural correctness</p></li>
+<li><p>melting temperature activation F_tm</p></li>
+<li><p>complementarity to displaced strand R_bn</p></li>
+<li><p>lack of complementarity to gRNA R_gr</p></li>
+<li><p>hybridization free energy score F_e</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>beacon_seq</strong> (<em>str</em>) – beacon DNA sequence</p></li>
+<li><p><strong>beacon_site</strong> (<em>str</em>) – displaced target site sequence</p></li>
+<li><p><strong>gRNA_seq</strong> (<em>str</em>) – guide RNA sequence (protospacer + tracr)</p></li>
+<li><p><strong>tm_floor</strong> (<em>float</em>) – minimum acceptable Tm for activation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple (global_score, R_bn, R_gr, F_tm, F_e, hairpin_score)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float, float, float, float, float, float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.beacon.score_energy">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.beacon.</span></span><span class="sig-name descname"><span class="pre">score_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dG</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-15.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/beacon.html#score_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.beacon.score_energy" title="Link to this definition"></a></dt>
+<dd><p>Rescale a free energy value into a [0,1] score.</p>
+<p>For ΔG &gt;= 0, returns 0.0. For ΔG &lt;= 2*thr, returns 1.0. Linearly interpolates in between.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dG</strong> (<em>float</em>) – free energy change (normally negative)</p></li>
+<li><p><strong>thr</strong> (<em>float</em>) – threshold free energy (negative) such that 2*thr maps to score 1.0</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normalized energy score in [0.0, 1.0]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.calculator">
+<span id="columbo-design-calculator-module"></span><h2>columbo_design.calculator module<a class="headerlink" href="#module-columbo_design.calculator" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.calculator.get_parse">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.calculator.</span></span><span class="sig-name descname"><span class="pre">get_parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="reference internal" href="_modules/columbo_design/calculator.html#get_parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.calculator.get_parse" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.calculator.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.calculator.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/calculator.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.calculator.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-columbo_design.cli">
+<span id="columbo-design-cli-module"></span><h2>columbo_design.cli module<a class="headerlink" href="#module-columbo_design.cli" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.cli.get_parse">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.cli.</span></span><span class="sig-name descname"><span class="pre">get_parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="reference internal" href="_modules/columbo_design/cli.html#get_parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.cli.get_parse" title="Link to this definition"></a></dt>
+<dd><p>Build and return the command-line argument parser.</p>
+<dl class="simple">
+<dt>Prepares two arguments:</dt><dd><ul class="simple">
+<li><p><cite>fasta</cite> (positional): path to the input FASTA file.</p></li>
+<li><p><cite>–output</cite> (optional): one of “json” or “pickle” (default: “json”),
+specifying desired output format.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Parsed arguments namespace.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>argparse.Namespace</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.cli.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/cli.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.cli.main" title="Link to this definition"></a></dt>
+<dd><p>Main entry point for the Columbo CLI tool.</p>
+<ol class="arabic simple">
+<li><p>Parses command-line arguments.</p></li>
+<li><p>Loads sequences from the given FASTA.</p></li>
+<li><p>Finds NGG PAM sites in each sequence.</p></li>
+<li><p>Builds ColumboParts objects and ranks top candidates.</p></li>
+<li><p>Designs molecular beacons and primers around each PAM.</p></li>
+<li><p>Writes results to JSON or pickle files.</p></li>
+<li><p>Prints a summary report to stdout.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If flanking window around a PAM goes out of sequence bounds.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.cli_2">
+<span id="columbo-design-cli-2-module"></span><h2>columbo_design.cli_2 module<a class="headerlink" href="#module-columbo_design.cli_2" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.cli_2.get_parse">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.cli_2.</span></span><span class="sig-name descname"><span class="pre">get_parse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="reference internal" href="_modules/columbo_design/cli_2.html#get_parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.cli_2.get_parse" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.cli_2.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.cli_2.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/cli_2.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.cli_2.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-columbo_design.core">
+<span id="columbo-design-core-module"></span><h2>columbo_design.core module<a class="headerlink" href="#module-columbo_design.core" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">ColumboParts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a CRISPR-Cas9 protospacer candidate (Columbo part). Stores sequence, scores, and melting temperature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>Seq</em>) – Full DNA sequence as a Biopython Seq object</p></li>
+<li><p><strong>position</strong> (<em>int</em>) – Zero-based index of the PAM start (NGG) within <cite>sequence</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.beacon_site">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">beacon_site</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Seq</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.beacon_site" title="Link to this definition"></a></dt>
+<dd><p>Sequence region used for beacon design (50 nt upstream + PAM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Beacon site sequence</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Seq</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calc_1">
+<span class="sig-name descname"><span class="pre">calc_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calc_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calc_1" title="Link to this definition"></a></dt>
+<dd><p>Score 1: 1 if GC content of protospacer &lt; 80%, else 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 or 0</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calc_2">
+<span class="sig-name descname"><span class="pre">calc_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calc_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calc_2" title="Link to this definition"></a></dt>
+<dd><p>Score 2: 1 if the base immediately upstream of PAM is not ‘G’, else 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 or 0</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calc_3">
+<span class="sig-name descname"><span class="pre">calc_3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calc_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calc_3" title="Link to this definition"></a></dt>
+<dd><p>Score 3: 1 if the base two positions upstream of PAM is not ‘T’, else 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 or 0</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calc_4">
+<span class="sig-name descname"><span class="pre">calc_4</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calc_4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calc_4" title="Link to this definition"></a></dt>
+<dd><p>Score 4: 1 if no homopolymer triplet (AAA, CCC, GGG, TTT), else 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 or 0</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calcular_scores">
+<span class="sig-name descname"><span class="pre">calcular_scores</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calcular_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calcular_scores" title="Link to this definition"></a></dt>
+<dd><p>Compute all four individual scores.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of four scores</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.calcular_tm">
+<span class="sig-name descname"><span class="pre">calcular_tm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.calcular_tm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.calcular_tm" title="Link to this definition"></a></dt>
+<dd><p>Compute melting temperature using nearest-neighbor method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Melting temperature in °C</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.from_json">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.from_json" title="Link to this definition"></a></dt>
+<dd><p>Reconstruct ColumboParts from a JSON string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>Seq</em>) – Original full sequence</p></li>
+<li><p><strong>json_str</strong> (<em>str</em>) – JSON string as produced by to_json()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New ColumboParts instance</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#columbo_design.core.ColumboParts" title="columbo_design.core.ColumboParts">ColumboParts</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.from_parts">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_parts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.from_parts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.from_parts" title="Link to this definition"></a></dt>
+<dd><p>Reconstruct ColumboParts from a dict of properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>Seq</em>) – Original full sequence</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – Dict with keys matching to_dict()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New ColumboParts instance</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#columbo_design.core.ColumboParts" title="columbo_design.core.ColumboParts">ColumboParts</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.pam">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pam</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Seq</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.pam" title="Link to this definition"></a></dt>
+<dd><p>PAM sequence (3 nt NGG).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PAM sequence</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Seq</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.position">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">position</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.position" title="Link to this definition"></a></dt>
+<dd><p>Position of PAM within the original sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Zero-based index of PAM</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.protospacer">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protospacer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Seq</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.protospacer" title="Link to this definition"></a></dt>
+<dd><p>Protospacer sequence (25 nt + PAM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Protospacer</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Seq</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.region">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Seq</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.region" title="Link to this definition"></a></dt>
+<dd><p>Flanking region around protospacer (200 nt upstream to 300 nt downstream).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sequence region</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Seq</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.score_medio">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score_medio</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.score_medio" title="Link to this definition"></a></dt>
+<dd><p>List of individual feature scores [gc_content, no_G_before_pam, no_T_2_upstream, no_homopolymer].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Individual scores</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.scores">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scores</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.scores" title="Link to this definition"></a></dt>
+<dd><p>Mean score across all features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Average score</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.tm">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tm</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#columbo_design.core.ColumboParts.tm" title="Link to this definition"></a></dt>
+<dd><p>Melting temperature of the protospacer (in °C).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Melting temperature</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Serialize instance to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict with keys [‘PAM’,’Protospacer’,’Position’,’Scores’,’Score_medio’,’Tm’]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="columbo_design.core.ColumboParts.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/core.html#ColumboParts.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.ColumboParts.to_json" title="Link to this definition"></a></dt>
+<dd><p>Serialize instance to JSON string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>JSON representation</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="columbo_design.core.Out_of_frame_ERROR">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">Out_of_frame_ERROR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mensaje</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'El</span> <span class="pre">PAM</span> <span class="pre">o</span> <span class="pre">Protospacer</span> <span class="pre">no</span> <span class="pre">tienen</span> <span class="pre">el</span> <span class="pre">tamaño</span> <span class="pre">mínimo</span> <span class="pre">requerido'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/core.html#Out_of_frame_ERROR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.Out_of_frame_ERROR" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when a PAM or protospacer falls outside the bounds of the sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<em>str</em>) – Error message to display</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.core.find_NGG_motivs">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">find_NGG_motivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#find_NGG_motivs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.find_NGG_motivs" title="Link to this definition"></a></dt>
+<dd><p>Find all NGG PAM motifs in each sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sequences</strong> (<em>dict</em>) – Dict of ID -&gt; sequence</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of ID -&gt; list of zero-based PAM start positions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, list[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.core.output_NGG_json">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">output_NGG_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motifs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#output_NGG_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.output_NGG_json" title="Link to this definition"></a></dt>
+<dd><p>Write top ColumboParts to output_NGG.json and return list of dicts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parts</strong> (<em>list</em>) – List of ColumboParts</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of serialized dicts</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.core.output_NGG_pickle">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">output_NGG_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motifs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#output_NGG_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.output_NGG_pickle" title="Link to this definition"></a></dt>
+<dd><p>Write top ColumboParts to output_NGG.pkl and return list of dicts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>parts</strong> (<em>list</em>) – List of ColumboParts</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of serialized dicts</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.core.process_genome">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">process_genome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motifs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#process_genome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.process_genome" title="Link to this definition"></a></dt>
+<dd><p>Build ColumboParts for each valid PAM and return top 20 by average score.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequences</strong> – Dict of ID -&gt; sequence</p></li>
+<li><p><strong>motifs</strong> – Dict of ID -&gt; list of PAM positions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Top 20 ColumboParts instances, sorted by score_medio descending</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#columbo_design.core.ColumboParts" title="columbo_design.core.ColumboParts">ColumboParts</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.core.read_fasta">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.core.</span></span><span class="sig-name descname"><span class="pre">read_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fastafile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/core.html#read_fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.core.read_fasta" title="Link to this definition"></a></dt>
+<dd><p>Read a FASTA file into a dict of clean DNA sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fastafile</strong> (<em>str</em>) – Path to FASTA file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict mapping record IDs to uppercase ATCG-only strings</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.data_storage">
+<span id="columbo-design-data-storage-module"></span><h2>columbo_design.data_storage module<a class="headerlink" href="#module-columbo_design.data_storage" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.data_storage.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.data_storage.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/data_storage.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.data_storage.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.data_storage.read_json">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.data_storage.</span></span><span class="sig-name descname"><span class="pre">read_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/data_storage.html#read_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.data_storage.read_json" title="Link to this definition"></a></dt>
+<dd><p>Args:
+esta función en cambio lee el archivo json, file_path, la ruta del archvivo JSON
+Return:
+un diccionario con los datos cargados</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.data_storage.read_pickle">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.data_storage.</span></span><span class="sig-name descname"><span class="pre">read_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/data_storage.html#read_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.data_storage.read_pickle" title="Link to this definition"></a></dt>
+<dd><p>Args:
+esta función en cambio lee el archivo json, file_path, la ruta del archvivo JSON
+Return:
+un diccionario con los datos cargados</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.data_storage.save_json">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.data_storage.</span></span><span class="sig-name descname"><span class="pre">save_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/data_storage.html#save_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.data_storage.save_json" title="Link to this definition"></a></dt>
+<dd><p>Args:
+esta funcion va a guardar los datos de el diccionario data en un archivo json
+la funcion coge los datos del diccioanrio y una ruta de archivo donde guardara los datos de json,
+osea un STRING donde guardara la ruta del archivo</p>
+<p>como no queremos usar datos ni leer datos en este caso,
+la función solo guarda los datos en un archivo JSON. No es necesario devolver nada,
+ya que su única tarea es escribir el archivo.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.data_storage.save_pickle">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.data_storage.</span></span><span class="sig-name descname"><span class="pre">save_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/data_storage.html#save_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.data_storage.save_pickle" title="Link to this definition"></a></dt>
+<dd><p>Args:
+esta funcion va a guardar los datos de el diccionario data en un archivo pickle
+la funcion coge los datos del diccioanrio y una ruta de archivo donde guardara los datos de json,
+osea un STRING donde guardara la ruta del archivo</p>
+<p>como no queremos usar datos ni leer datos en este caso,
+la función solo guarda los datos en un archivo JSON. No es necesario devolver nada,
+ya que su única tarea es escribir el archivo.</p>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.dna_analysis">
+<span id="columbo-design-dna-analysis-module"></span><h2>columbo_design.dna_analysis module<a class="headerlink" href="#module-columbo_design.dna_analysis" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.dna_analysis.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.dna_analysis.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/dna_analysis.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.dna_analysis.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.dna_analysis.search_restriction_sites">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.dna_analysis.</span></span><span class="sig-name descname"><span class="pre">search_restriction_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/dna_analysis.html#search_restriction_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.dna_analysis.search_restriction_sites" title="Link to this definition"></a></dt>
+<dd><p>Busca los sitios de corte de varias enzimas de restricción en una secuencia de ADN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<em>str</em>) – Secuencia de ADN a analizar.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Diccionario con las posiciones donde se encuentra el patrón de cada enzima.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.dna_analysis_2">
+<span id="columbo-design-dna-analysis-2-module"></span><h2>columbo_design.dna_analysis_2 module<a class="headerlink" href="#module-columbo_design.dna_analysis_2" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.dna_analysis_2.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.dna_analysis_2.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/dna_analysis_2.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.dna_analysis_2.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.dna_analysis_2.search_restriction_sites">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.dna_analysis_2.</span></span><span class="sig-name descname"><span class="pre">search_restriction_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enzyme_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="_modules/columbo_design/dna_analysis_2.html#search_restriction_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.dna_analysis_2.search_restriction_sites" title="Link to this definition"></a></dt>
+<dd><p>Busca los sitios de corte de una enzima de restricción específica en una secuencia de ADN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>str</em>) – Secuencia de ADN a analizar.</p></li>
+<li><p><strong>enzyme_name</strong> (<em>str</em>) – Nombre de la enzima a buscar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Número de coincidencias y lista de posiciones donde se encuentra el patrón.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.issue_2">
+<span id="columbo-design-issue-2-module"></span><h2>columbo_design.issue_2 module<a class="headerlink" href="#module-columbo_design.issue_2" title="Link to this heading"></a></h2>
+</section>
+<section id="module-columbo_design.issue_4_2">
+<span id="columbo-design-issue-4-2-module"></span><h2>columbo_design.issue_4_2 module<a class="headerlink" href="#module-columbo_design.issue_4_2" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.issue_4_2.vienna_RNA">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.issue_4_2.</span></span><span class="sig-name descname"><span class="pre">vienna_RNA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RNA_seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/issue_4_2.html#vienna_RNA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.issue_4_2.vienna_RNA" title="Link to this definition"></a></dt>
+<dd><p>Función que analiza una secuencia de ARN y retorna su estructura secundaria y energía mínima.</p>
+<dl class="simple">
+<dt>Parámetros:</dt><dd><p>RNA_seq (str): Secuencia de ARN en formato string.</p>
+</dd>
+<dt>Retorno:</dt><dd><p>dict: Diccionario con la estructura secundaria y la energía mínima de la secuencia.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.json_pickle">
+<span id="columbo-design-json-pickle-module"></span><h2>columbo_design.json_pickle module<a class="headerlink" href="#module-columbo_design.json_pickle" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.json_pickle.klkmanin">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.json_pickle.</span></span><span class="sig-name descname"><span class="pre">klkmanin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/json_pickle.html#klkmanin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.json_pickle.klkmanin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-columbo_design.modsum">
+<span id="columbo-design-modsum-module"></span><h2>columbo_design.modsum module<a class="headerlink" href="#module-columbo_design.modsum" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.modsum.modsum">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.modsum.</span></span><span class="sig-name descname"><span class="pre">modsum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/columbo_design/modsum.html#modsum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.modsum.modsum" title="Link to this definition"></a></dt>
+<dd><p>Realiza la suma en módulo <code class="docutils literal notranslate"><span class="pre">c</span></code> de dos números <code class="docutils literal notranslate"><span class="pre">a</span></code> y <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p>
+<p>En caso de que el usuario no proporcione la base <code class="docutils literal notranslate"><span class="pre">c</span></code>, devuelve la suma habitual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>int</em>) – Primer número a sumar.</p></li>
+<li><p><strong>b</strong> (<em>int</em>) – Segundo número a sumar.</p></li>
+<li><p><strong>c</strong> – Base para calcular el módulo. Default: 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.parse_analysis">
+<span id="columbo-design-parse-analysis-module"></span><h2>columbo_design.parse_analysis module<a class="headerlink" href="#module-columbo_design.parse_analysis" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.parse_analysis.get_args">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.parse_analysis.</span></span><span class="sig-name descname"><span class="pre">get_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Namespace</span></span></span><a class="reference internal" href="_modules/columbo_design/parse_analysis.html#get_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.parse_analysis.get_args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.parse_analysis.main">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.parse_analysis.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/columbo_design/parse_analysis.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.parse_analysis.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-columbo_design.primer_design">
+<span id="columbo-design-primer-design-module"></span><h2>columbo_design.primer_design module<a class="headerlink" href="#module-columbo_design.primer_design" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.primer_design.output_pimers_json">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.primer_design.</span></span><span class="sig-name descname"><span class="pre">output_pimers_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/primer_design.html#output_pimers_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.primer_design.output_pimers_json" title="Link to this definition"></a></dt>
+<dd><p>Write Primer3 output to JSON and load it back.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> (<em>dict</em>) – Primer3 output dictionary.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed JSON as Python dict.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.primer_design.output_primers_pickle">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.primer_design.</span></span><span class="sig-name descname"><span class="pre">output_primers_pickle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/primer_design.html#output_primers_pickle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.primer_design.output_primers_pickle" title="Link to this definition"></a></dt>
+<dd><p>Serialize Primer3 output to a pickle file and reload it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> (<em>dict</em>) – Primer3 output dictionary.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unpickled Python dict.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.primer_design.parse_primers_output">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.primer_design.</span></span><span class="sig-name descname"><span class="pre">parse_primers_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/primer_design.html#parse_primers_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.primer_design.parse_primers_output" title="Link to this definition"></a></dt>
+<dd><p>Extract primer sequences and their complements from Primer3 output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>dict</em>) – Primer3 output dictionary.</p></li>
+<li><p><strong>region</strong> (<em>str</em>) – DNA substring used for primer design.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary with left/right primers and complement/reverse-complement.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If no primers are found in <cite>output</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.primer_design.primer3_design_columbo">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.primer_design.</span></span><span class="sig-name descname"><span class="pre">primer3_design_columbo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_pos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/columbo_design/primer_design.html#primer3_design_columbo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.primer_design.primer3_design_columbo" title="Link to this definition"></a></dt>
+<dd><p>Design forward and reverse primers around a CRISPR PAM site using Primer3.</p>
+<p>This function takes a DNA sequence and the zero-based index of the PAM
+site, then calls Primer3 to select primers flanking the protospacer region
+(25 nt upstream + PAM).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> (<em>str</em>) – Full DNA sequence to search for primers.</p></li>
+<li><p><strong>pam_pos</strong> (<em>int</em>) – Zero-based index of the first base of the PAM motif in <cite>seq</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Primer3 raw output dictionary containing primer positions and metrics.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>seq</cite> contains no valid bases after cleaning.</p></li>
+<li><p><strong>RuntimeError</strong> – When Primer3 fails to find any primer pairs.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="columbo_design.primer_design.score_primers">
+<span class="sig-prename descclassname"><span class="pre">columbo_design.primer_design.</span></span><span class="sig-name descname"><span class="pre">score_primers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pam_relative_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protospacer_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/columbo_design/primer_design.html#score_primers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#columbo_design.primer_design.score_primers" title="Link to this definition"></a></dt>
+<dd><p>Compute a composite score for primer pairs based on distance, GC content, and Tm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>dict</em>) – Primer3 output dictionary from <cite>primer3_design_columbo</cite>.</p></li>
+<li><p><strong>pam_relative_pos</strong> (<em>int</em>) – Position of PAM relative to the start of the provided sequence.</p></li>
+<li><p><strong>protospacer_len</strong> (<em>int</em>) – Length of the protospacer (default 25 nt).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Composite score in [0.0, 1.0].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If expected Primer3 keys are missing in <cite>output</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-columbo_design.prueba">
+<span id="columbo-design-prueba-module"></span><h2>columbo_design.prueba module<a class="headerlink" href="#module-columbo_design.prueba" title="Link to this heading"></a></h2>
+</section>
+<section id="module-columbo_design">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-columbo_design" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="src" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Julio &lt;jcochenta@gmail.com&gt;, luksgrin &lt;lucas.goiriz@csic.es&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

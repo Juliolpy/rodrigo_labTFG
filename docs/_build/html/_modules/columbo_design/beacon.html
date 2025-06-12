@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>columbo_design.beacon &mdash; Columbo Design 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Columbo Design
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Columbo Design</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">columbo_design.beacon</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for columbo_design.beacon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># TERCERA PARTE DEL SCRIPT CORE donde se diseña el Beacon con sus scores correspondientes</span>
+
+<span class="c1"># Importamos los módulos necesarios</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">RNA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.SeqUtils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeltingTemp</span> <span class="k">as</span> <span class="n">mt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio</span><span class="w"> </span><span class="kn">import</span> <span class="n">SeqIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.Seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="c1"># Función de folding</span>
+<div class="viewcode-block" id="fold_beacon">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.fold_beacon">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fold_beacon</span><span class="p">(</span><span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fold a DNA beacon sequence into its RNA secondary structure and compute its minimum free energy (MFE).</span>
+
+<span class="sd">    This function converts the input DNA sequence to RNA by replacing Ts with Us, then uses ViennaRNA</span>
+<span class="sd">    to calculate the secondary structure in dot-bracket notation and the associated MFE.</span>
+
+<span class="sd">    :param seq: DNA sequence of the beacon</span>
+<span class="sd">    :type seq: str</span>
+<span class="sd">    :return: tuple containing the secondary structure (dot-bracket) and its MFE in kcal/mol</span>
+<span class="sd">    :rtype: (str, float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert DNA to RNA (replace T with U)</span>
+    <span class="n">rna</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span>
+    <span class="c1"># Use ViennaRNA to fold the RNA sequence</span>
+    <span class="n">struct</span><span class="p">,</span> <span class="n">mfe</span> <span class="o">=</span> <span class="n">RNA</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">rna</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">struct</span><span class="p">,</span> <span class="n">mfe</span></div>
+
+
+<span class="c1"># Función de energía libre en la hibridación</span>
+<div class="viewcode-block" id="hybridation_energy">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.hybridation_energy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hybridation_energy</span><span class="p">(</span><span class="n">beacon</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the hybridization free energy between a beacon and its target sequence.</span>
+
+<span class="sd">    Both input sequences are first converted to RNA (T -&gt; U) before calling RNA.duplexfold.</span>
+
+<span class="sd">    :param beacon: DNA sequence of the beacon</span>
+<span class="sd">    :type beacon: str</span>
+<span class="sd">    :param target: DNA sequence of the target (complementary displaced strand)</span>
+<span class="sd">    :type target: str</span>
+<span class="sd">    :return: hybridization energy ΔG in kcal/mol (negative value indicates favorable binding)</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># hacer RNA la secuencia del beacon</span>
+    <span class="n">r_beacon</span> <span class="o">=</span> <span class="n">beacon</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span>
+    <span class="n">r_target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">RNA</span><span class="o">.</span><span class="n">duplexfold</span><span class="p">(</span><span class="n">r_beacon</span><span class="p">,</span> <span class="n">r_target</span><span class="p">)</span><span class="o">.</span><span class="n">energy</span></div>
+
+
+<span class="c1"># reescalado de energía, score de energía libre</span>
+<div class="viewcode-block" id="score_energy">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.score_energy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_energy</span><span class="p">(</span><span class="n">dG</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">thr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">15.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rescale a free energy value into a [0,1] score.</span>
+
+<span class="sd">    For ΔG &gt;= 0, returns 0.0. For ΔG &lt;= 2*thr, returns 1.0. Linearly interpolates in between.</span>
+
+<span class="sd">    :param dG: free energy change (normally negative)</span>
+<span class="sd">    :type dG: float</span>
+<span class="sd">    :param thr: threshold free energy (negative) such that 2*thr maps to score 1.0</span>
+<span class="sd">    :type thr: float</span>
+<span class="sd">    :return: normalized energy score in [0.0, 1.0]</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 15 kcal/mol </span>
+    <span class="n">strenght</span> <span class="o">=</span> <span class="o">-</span><span class="n">dG</span>
+    <span class="k">if</span> <span class="n">strenght</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">strenght</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="n">thr</span><span class="o">*</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">strenght</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="n">thr</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<span class="c1"># vemos que el hairpin tiene efecticamente 11 nt en stem y 9 en el loop</span>
+<div class="viewcode-block" id="hairpin_correct">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.hairpin_correct">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hairpin_correct</span><span class="p">(</span><span class="n">struct</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ideal_stem</span><span class="o">=</span><span class="mi">11</span> <span class="p">,</span> <span class="n">ideal_loop</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span> 
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluate how close a folded beacon hairpin matches the ideal stem-loop-stem pattern.</span>
+
+<span class="sd">    The function checks the lengths of the initial run of &#39;(&#39; (stem1),</span>
+<span class="sd">    the central run of &#39;.&#39; (loop), and the final run of &#39;)&#39; (stem2). Each is normalized</span>
+<span class="sd">    by its ideal length and averaged to produce a score in [0,1].</span>
+
+<span class="sd">    :param struct: RNA secondary structure in dot-bracket notation</span>
+<span class="sd">    :type struct: str</span>
+<span class="sd">    :param ideal_stem: ideal number of base pairs in each stem</span>
+<span class="sd">    :type ideal_stem: int</span>
+<span class="sd">    :param ideal_loop: ideal number of unpaired bases in the loop</span>
+<span class="sd">    :type ideal_loop: int</span>
+<span class="sd">    :return: average normalized score of (stem1, loop, stem2)</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># patron = r&quot;^\({%d,}\.{%d,}\){%d,}&quot; % (stem_len, loop_len, stem_len)</span>
+    <span class="c1"># redex desglosado:</span>
+    <span class="c1"># parentesis ( desde el incio del primer stem_len</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\(+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\(+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="c1"># puntos del loop_len</span>
+    <span class="n">middle</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\.+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\.+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="c1"># parentesis de la derecha, stem_len final</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\)+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\)+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="c1"># ahora normalizamos cada parte</span>
+    <span class="n">s_left</span>  <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left</span><span class="p">,</span>  <span class="n">ideal_stem</span><span class="p">)</span> <span class="o">/</span> <span class="n">ideal_stem</span>
+    <span class="n">s_mid</span>   <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">middle</span><span class="p">,</span>   <span class="n">ideal_loop</span><span class="p">)</span> <span class="o">/</span> <span class="n">ideal_loop</span>
+    <span class="n">s_right</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">ideal_stem</span><span class="p">)</span> <span class="o">/</span> <span class="n">ideal_stem</span>
+
+    <span class="c1"># y devolvemos la media de los tres (valor en [0,1])</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">s_left</span> <span class="o">+</span> <span class="n">s_mid</span> <span class="o">+</span> <span class="n">s_right</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span></div>
+
+    
+<div class="viewcode-block" id="beacon_tm">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.beacon_tm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beacon_tm</span><span class="p">(</span><span class="n">tm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">t_min</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">50.0</span><span class="p">,</span> <span class="n">t_floor</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">45.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Activation function for melting temperature: maps Tm to [0,1].</span>
+
+<span class="sd">    0 if tm &lt; t_floor, linearly increases to 1 at tm &gt;= t_min.</span>
+
+<span class="sd">    :param tm: melting temperature in °C</span>
+<span class="sd">    :type tm: float</span>
+<span class="sd">    :param t_min: temperature at which score == 1.0</span>
+<span class="sd">    :type t_min: float</span>
+<span class="sd">    :param t_floor: temperature below which score == 0.0</span>
+<span class="sd">    :type t_floor: float</span>
+<span class="sd">    :return: normalized Tm score between 0 and 1</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">tm</span> <span class="o">&lt;</span> <span class="n">t_floor</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">if</span> <span class="n">tm</span> <span class="o">&gt;=</span> <span class="n">t_min</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">tm</span> <span class="o">-</span> <span class="n">t_floor</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">t_min</span> <span class="o">-</span> <span class="n">t_floor</span><span class="p">)</span></div>
+
+
+<span class="c1"># para ver unicamente la tm</span>
+<div class="viewcode-block" id="melting_temperature">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.melting_temperature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">melting_temperature</span><span class="p">(</span><span class="n">seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the DNA melting temperature (Tm) of a sequence using nearest-neighbor thermodynamics.</span>
+
+<span class="sd">    :param seq: nucleotide sequence (DNA or RNA)</span>
+<span class="sd">    :type seq: str</span>
+<span class="sd">    :return: melting temperature in °C</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span>  <span class="c1"># Asegurar secuencia RNA válida</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">mt</span><span class="o">.</span><span class="n">Tm_NN</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span></div>
+
+
+<span class="c1"># para encapsular la funcion de la complemetariedad de bases</span>
+<div class="viewcode-block" id="ratio_complement">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.ratio_complement">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ratio_complement</span><span class="p">(</span><span class="n">seq1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">seq2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the fraction of complementary base pairs (A-T, G-C) between two aligned sequences.</span>
+
+<span class="sd">    :param seq1: first nucleotide sequence</span>
+<span class="sd">    :type seq1: str</span>
+<span class="sd">    :param seq2: second nucleotide sequence</span>
+<span class="sd">    :type seq2: str</span>
+<span class="sd">    :return: fraction of positions with canonical complementarity</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_pair</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">:</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">}</span>
+    <span class="n">min_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seq1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq2</span><span class="p">))</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">seq1</span><span class="p">[:</span><span class="n">min_len</span><span class="p">],</span> <span class="n">seq2</span><span class="p">[:</span><span class="n">min_len</span><span class="p">])</span> <span class="k">if</span> <span class="n">base_pair</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">matches</span> <span class="o">/</span> <span class="n">min_len</span> <span class="k">if</span> <span class="n">min_len</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="penalize_structure_dot_bracket">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.penalize_structure_dot_bracket">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">penalize_structure_dot_bracket</span><span class="p">(</span><span class="n">dot_bracket</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Penaliza estructuras de beacon que no tengan forma clara de hairpin.</span>
+<span class="sd">    Estructura ideal: starts with &#39;(((&#39;, ends with &#39;)))&#39; y un solo loop central de puntos.</span>
+
+<span class="sd">    :param dot_bracket: dot_bracket representation of the folding beacon sequence</span>
+<span class="sd">    :type dot_bracket: str</span>
+<span class="sd">    :return: score based on penalization of beacon structure</span>
+<span class="sd">    :rtype: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># 1. Verificar que empieza con un stem (al menos 3 paréntesis izquierdos)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dot_bracket</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;(((&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="c1"># 2. Verificar que termina con un stem (al menos 3 paréntesis derechos)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dot_bracket</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;)))&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="c1"># 3. Verificar que hay **solo un loop** de puntos (p.ej. no puntos sueltos o múltiples bloques)</span>
+    <span class="n">loop_parts</span> <span class="o">=</span> <span class="n">dot_bracket</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;()&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">loop_parts</span> <span class="k">if</span> <span class="n">p</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># más de un bloque de puntos</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="c1"># 4. Verificar que los puntos estén todos agrupados (loop continuo)</span>
+    <span class="k">if</span> <span class="s1">&#39;().&#39;</span> <span class="ow">in</span> <span class="n">dot_bracket</span> <span class="ow">or</span> <span class="s1">&#39;(.()&#39;</span> <span class="ow">in</span> <span class="n">dot_bracket</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Si pasa todos los filtros, se considera válida</span>
+    <span class="k">return</span> <span class="mf">1.0</span></div>
+
+
+<div class="viewcode-block" id="score_beacon">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.score_beacon">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_beacon</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">beacon_site</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gRNA_seq</span><span class="p">:</span> <span class="nb">str</span> <span class="p">,</span><span class="n">tm_floor</span><span class="p">:</span><span class="nb">float</span><span class="o">=</span><span class="mf">50.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the overall molecular beacon performance score and its components.</span>
+
+<span class="sd">    Combines:</span>
+<span class="sd">      1. hairpin structural correctness</span>
+<span class="sd">      2. melting temperature activation F_tm</span>
+<span class="sd">      3. complementarity to displaced strand R_bn</span>
+<span class="sd">      4. lack of complementarity to gRNA R_gr</span>
+<span class="sd">      5. hybridization free energy score F_e</span>
+
+<span class="sd">    :param beacon_seq: beacon DNA sequence</span>
+<span class="sd">    :type beacon_seq: str</span>
+<span class="sd">    :param beacon_site: displaced target site sequence</span>
+<span class="sd">    :type beacon_site: str</span>
+<span class="sd">    :param gRNA_seq: guide RNA sequence (protospacer + tracr)</span>
+<span class="sd">    :type gRNA_seq: str</span>
+<span class="sd">    :param tm_floor: minimum acceptable Tm for activation</span>
+<span class="sd">    :type tm_floor: float</span>
+<span class="sd">    :return: tuple (global_score, R_bn, R_gr, F_tm, F_e, hairpin_score)</span>
+<span class="sd">    :rtype: (float, float, float, float, float, float)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Estructura</span>
+    <span class="n">beacon_region</span> <span class="o">=</span> <span class="n">beacon_site</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">)]</span>
+    <span class="n">struct</span><span class="p">,</span> <span class="n">beacon_mfe</span> <span class="o">=</span> <span class="n">fold_beacon</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">)</span>
+    <span class="n">hp_raw</span> <span class="o">=</span> <span class="n">hairpin_correct</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+    <span class="n">penalization</span> <span class="o">=</span> <span class="n">penalize_structure_dot_bracket</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+    <span class="n">hp</span> <span class="o">=</span> <span class="n">hp_raw</span> <span class="o">*</span> <span class="n">penalization</span>
+    <span class="c1"># 2. Tm</span>
+    <span class="n">tm_val</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">Tm_NN</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">beacon_tm</span><span class="p">(</span><span class="n">tm_val</span><span class="p">,</span> <span class="n">t_min</span><span class="o">=</span><span class="n">tm_floor</span><span class="p">)</span>
+
+    <span class="c1"># 3. Ratio beacon:nicada (simulación simple: fraction of complementarity)</span>
+    
+    <span class="n">R_bn</span> <span class="o">=</span> <span class="n">ratio_complement</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">beacon_region</span><span class="p">)))</span>
+
+    <span class="c1"># 4. Ratio gRNA libre = 1 - fraction complementary to beacon</span>
+
+    <span class="n">R_gr</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">ratio_complement</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">,</span> <span class="n">gRNA_seq</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">)])</span>
+
+    <span class="c1"># 5 Energía mínima para la unión beacon con hebra desplazada</span>
+    <span class="n">dG</span> <span class="o">=</span> <span class="n">hybridation_energy</span><span class="p">(</span><span class="n">beacon_seq</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">beacon_region</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">()))</span>
+    <span class="n">F_e</span> <span class="o">=</span> <span class="n">score_energy</span><span class="p">(</span><span class="n">dG</span><span class="p">,</span> <span class="n">thr</span><span class="o">=-</span><span class="mf">15.0</span><span class="p">)</span>
+    <span class="c1"># componentes de todo el score en una lista</span>
+    <span class="n">score_components</span> <span class="o">=</span> <span class="p">[</span><span class="n">hp</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">R_bn</span><span class="p">,</span> <span class="n">R_gr</span><span class="p">,</span> <span class="n">F_e</span><span class="p">]</span>
+    <span class="c1"># Score global</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">score_components</span><span class="p">:</span>
+        <span class="n">score</span> <span class="o">*=</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">elements</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">1e-9</span>
+        <span class="n">score</span> <span class="o">**=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">score_components</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">score</span><span class="p">,</span> <span class="n">R_bn</span><span class="p">,</span> <span class="n">R_gr</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">F_e</span><span class="p">,</span> <span class="n">hp</span></div>
+
+
+
+<div class="viewcode-block" id="design_beacon">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.design_beacon">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">design_beacon</span><span class="p">(</span><span class="n">beacon_site</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stem_len</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">loop_len</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Design a DNA molecular beacon sequence from a target site.</span>
+
+<span class="sd">    Beacon = [stem1 | loop | stem2], where:</span>
+<span class="sd">      - stem1 = first stem_len nt of the displaced strand reverse</span>
+<span class="sd">      - loop   = complementary of central region</span>
+<span class="sd">      - stem2 = inverse complement of stem1</span>
+
+<span class="sd">    :param beacon_site: target region sequence (displaced strand)</span>
+<span class="sd">    :type beacon_site: str</span>
+<span class="sd">    :param stem_len: length of each stem arm</span>
+<span class="sd">    :type stem_len: int</span>
+<span class="sd">    :param loop_len: length of the loop (unused, inferred from site)</span>
+<span class="sd">    :type loop_len: int</span>
+<span class="sd">    :return: designed beacon DNA sequence</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1) hebra desplazada (la que se emparejará con beacon)</span>
+    <span class="n">beacon_region</span> <span class="o">=</span> <span class="n">beacon_site</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span> <span class="c1"># aquí es donde ajustamos donde queremos que vaya el beacon de nuestra región más grande</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">beacon_region</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="c1"># 2) definimos stem₁</span>
+    <span class="n">stem1</span> <span class="o">=</span> <span class="n">target</span><span class="p">[:</span><span class="n">stem_len</span><span class="p">]</span>
+
+    <span class="c1"># 3) stem₂ = complemento inverso de stem₁</span>
+    <span class="n">stem2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">stem1</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># 4) todo el trozo intermedio (justo lo que queda entre stems) es el loop</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">stem1</span><span class="p">)</span> <span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">stem1</span><span class="p">)])</span>
+    <span class="n">loop_real</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># 4) stem₂ = complemento inverso de stem₁</span>
+    
+    <span class="k">return</span> <span class="n">stem1</span> <span class="o">+</span> <span class="n">loop_real</span> <span class="o">+</span> <span class="n">stem2</span></div>
+
+
+<span class="c1"># funcion auxiliar para contar --&gt; CHATGPT </span>
+<div class="viewcode-block" id="count_hairpin">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.beacon.count_hairpin">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_hairpin</span><span class="p">(</span><span class="n">struct</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Count stem1, loop, and stem2 lengths in a dot-bracket structure.</span>
+
+<span class="sd">    :param struct: RNA secondary structure in dot-bracket</span>
+<span class="sd">    :type struct: str</span>
+<span class="sd">    :return: tuple (stem1_length, loop_length, stem2_length)</span>
+<span class="sd">    :rtype: (int, int, int)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1) stem₁ = run inicial de &#39;(&#39;</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\(+&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+    <span class="n">stem1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">m1</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="c1"># 2) loop = run de &#39;.&#39; justo después de ese stem₁ (y antes del último &#39;)&#39;)</span>
+    <span class="n">middle_region</span> <span class="o">=</span> <span class="n">struct</span><span class="p">[</span><span class="n">stem1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span><span class="o">-</span><span class="n">stem1</span><span class="p">]</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\.+&#39;</span><span class="p">,</span> <span class="n">middle_region</span><span class="p">)</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">m2</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="c1"># 3) stem₂ = run final de &#39;)&#39;</span>
+    <span class="n">m3</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\)+$&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+    <span class="n">stem2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m3</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">m3</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">stem1</span><span class="p">,</span> <span class="n">loop</span><span class="p">,</span> <span class="n">stem2</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Julio &lt;jcochenta@gmail.com&gt;, luksgrin &lt;lucas.goiriz@csic.es&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

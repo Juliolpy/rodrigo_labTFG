@@ -1,7 +1,5 @@
 import re
 
-sequence = input(str("introduce la secuecia de interés para encontrar sitios de restriccion BamHI, Recuerda que es  < 'GGATCC'> : "))
-
 def search_restriction_sites(sequence: str) -> dict:
     """
     Busca los sitios de corte de varias enzimas de restricción en una secuencia de ADN.
@@ -48,4 +46,5 @@ def main():
     print(f"{encontro} {len(cuantos)} {coincidencias} en {posicion} {sitio} con el sitio de corte de BamHI: GGATCC")
 
 if __name__ == "__main__":
+    sequence = input(str("introduce la secuecia de interés para encontrar sitios de restriccion BamHI, Recuerda que es  < 'GGATCC'> : "))
     main()

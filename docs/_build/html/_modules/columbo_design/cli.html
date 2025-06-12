@@ -1,0 +1,389 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>columbo_design.cli &mdash; Columbo Design 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Columbo Design
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Columbo Design</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">columbo_design.cli</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for columbo_design.cli</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Entrypoint file</span>
+<span class="c1"># añadimos parser que le de al usuario la facilidad de pasar un path al fichero fasta</span>
+
+<span class="c1"># El fichero cli.py debe importar las funciones de core.py y darle los argumentos adecuados a las mismas</span>
+<span class="c1"># para que estas realicen los cálculos, y luego desde cli.py hay que sacar por pantalla los resultados para que los vea el usuario.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">Bio.Seq</span><span class="w"> </span><span class="kn">import</span> <span class="n">Seq</span>
+<span class="c1"># importamos las funciones del codigo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_fasta</span><span class="p">,</span> <span class="n">find_NGG_motivs</span><span class="p">,</span> <span class="n">process_genome</span><span class="p">,</span> <span class="n">output_NGG_json</span><span class="p">,</span> <span class="n">output_NGG_pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.primer_design</span><span class="w"> </span><span class="kn">import</span> <span class="n">primer3_design_columbo</span><span class="p">,</span> <span class="n">output_pimers_json</span><span class="p">,</span> <span class="n">output_primers_pickle</span><span class="p">,</span> <span class="n">score_primers</span><span class="p">,</span> <span class="n">parse_primers_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.beacon</span><span class="w"> </span><span class="kn">import</span> <span class="n">design_beacon</span><span class="p">,</span> <span class="n">score_beacon</span><span class="p">,</span> <span class="n">fold_beacon</span><span class="p">,</span> <span class="n">beacon_tm</span><span class="p">,</span> <span class="n">melting_temperature</span><span class="p">,</span> <span class="n">score_energy</span><span class="p">,</span> <span class="n">hybridation_energy</span><span class="p">,</span> <span class="n">count_hairpin</span>
+
+<span class="c1"># definimos nuestra funcion parser</span>
+<div class="viewcode-block" id="get_parse">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.cli.get_parse">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_parse</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build and return the command-line argument parser.</span>
+
+<span class="sd">    Prepares two arguments:</span>
+<span class="sd">      - `fasta` (positional): path to the input FASTA file.</span>
+<span class="sd">      - `--output` (optional): one of &quot;json&quot; or &quot;pickle&quot; (default: &quot;json&quot;), </span>
+<span class="sd">        specifying desired output format.</span>
+
+<span class="sd">    :return: Parsed arguments namespace.</span>
+<span class="sd">    :rtype: argparse.Namespace</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># variable</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span> <span class="s2">&quot;esto es un programa para encontrar motivos NGG en secuencias de ADN en virus&quot;</span><span class="p">)</span>
+
+    <span class="c1"># añadimos los argumentos que necesitará nuestro comando de argumentos</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;fasta&quot;</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Especique el archivo .fasta a analizar&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;pickle&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span> <span class="s2">&quot;Especifica el tipo de archivo de salida que deseas obtener&quot;</span><span class="p">)</span>
+    <span class="c1"># guardamos los valores en la funcion</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
+
+
+<span class="c1"># para ejecutar la función de manera manual</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.cli.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main entry point for the Columbo CLI tool.</span>
+
+<span class="sd">    1. Parses command-line arguments.</span>
+<span class="sd">    2. Loads sequences from the given FASTA.</span>
+<span class="sd">    3. Finds NGG PAM sites in each sequence.</span>
+<span class="sd">    4. Builds ColumboParts objects and ranks top candidates.</span>
+<span class="sd">    5. Designs molecular beacons and primers around each PAM.</span>
+<span class="sd">    6. Writes results to JSON or pickle files.</span>
+<span class="sd">    7. Prints a summary report to stdout.</span>
+
+<span class="sd">    :raises ValueError: If flanking window around a PAM goes out of sequence bounds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ANSI colores y el tracRNA que es siempre el mismo</span>
+    <span class="n">RED</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[91m&quot;</span>
+    <span class="n">AZU</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[34m&quot;</span>
+    <span class="n">CIAN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[96m&quot;</span>
+    <span class="n">GREEN</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[92m&quot;</span>
+    <span class="n">GR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[92m&quot;</span>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+    <span class="n">MAG</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[35m&quot;</span>
+    <span class="n">YELL</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[33m&quot;</span>
+    <span class="n">tracrRNA</span> <span class="o">=</span> <span class="s2">&quot;GUUUUAGAGCUAGAAAUAGCAAGUUAAAAUAAGGCUAGUCCGUUAUCAACUUGAAAAAGUGGCACCGAGUCGGUGCUUUUUU&quot;</span>
+    <span class="n">tracrDNA</span> <span class="o">=</span> <span class="n">tracrRNA</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">)</span> <span class="c1"># Transformamos a DNA para ver complementariedad DNA // DNA</span>
+
+    <span class="n">time_start_total</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="c1"># reclutamos la función get_parse()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_parse</span><span class="p">()</span>
+
+    <span class="c1"># asignamos la función de leer el fasta y encontrar el ngg</span>
+    <span class="n">sequences</span> <span class="o">=</span>  <span class="n">read_fasta</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">fasta</span><span class="p">)</span>
+    <span class="n">NGG_positions</span> <span class="o">=</span> <span class="n">find_NGG_motivs</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+    <span class="n">top_candidates</span> <span class="o">=</span> <span class="n">process_genome</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">NGG_positions</span><span class="p">)</span> <span class="c1"># vemos cuales son los resultados de la clase y los almacenamos en la variable top_candidates</span>
+
+    <span class="n">beacons_for_obj</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">primers_for_obj</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1">#  -- Datos para el benchmarking -- </span>
+    <span class="n">columbo_times</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># lista de tiempos de cada ColumboPart</span>
+    <span class="n">primer_scores</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># lista de scores obtenidos para cada ColumboPart</span>
+    <span class="n">primer_failure</span> <span class="o">=</span> <span class="mi">0</span>     <span class="c1"># cuantas ColumboParts no pudieron diseñar primers</span>
+    <span class="n">total_parts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">top_candidates</span><span class="p">:</span>
+            <span class="n">part_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">total_parts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># definir region alrrederor del PAM para diseñar los primers ( x nt upstream y downstream)</span>
+            <span class="n">pam_pos</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_position</span>
+            <span class="n">full_seq</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[</span><span class="n">seq_id</span><span class="p">]</span> <span class="c1"># solo la secuencia del dict</span>
+            <span class="n">flank</span> <span class="o">=</span> <span class="mi">45</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">pam_pos</span> <span class="o">-</span> <span class="n">flank</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">full_seq</span><span class="p">),</span> <span class="n">pam_pos</span> <span class="o">+</span> <span class="mi">25</span> <span class="o">+</span> <span class="n">flank</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">full_seq</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;El flanqueo sale de los límites de la secuencia.&quot;</span><span class="p">)</span>
+            <span class="c1"># objetos para la funcion de primers</span>
+            <span class="n">subseq</span> <span class="o">=</span> <span class="n">full_seq</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="c1">#region_for_primers = str(Seq(obj._primer_region))</span>
+            <span class="c1"># funcion beacon</span>
+            <span class="n">gRNA</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">tracrRNA</span>
+            <span class="n">gDNA</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span><span class="s2">&quot;T&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]))</span> <span class="o">+</span> <span class="n">tracrDNA</span>
+            <span class="n">beacon</span> <span class="o">=</span> <span class="n">design_beacon</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+            <span class="n">beacon_region</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">beacon</span><span class="p">)]</span>
+            <span class="n">beacon_struct</span><span class="p">,</span> <span class="n">beacon_mfe</span> <span class="o">=</span> <span class="n">fold_beacon</span><span class="p">(</span><span class="n">beacon</span><span class="p">)</span>
+            <span class="n">stem1_len</span><span class="p">,</span> <span class="n">loop_len</span><span class="p">,</span> <span class="n">stem2_len</span> <span class="o">=</span> <span class="n">count_hairpin</span><span class="p">(</span><span class="n">beacon_struct</span><span class="p">)</span>
+            <span class="n">hybridation_e</span> <span class="o">=</span> <span class="n">hybridation_energy</span><span class="p">(</span><span class="n">beacon</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">beacon_region</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">()))</span>
+            <span class="n">score_hybridation</span> <span class="o">=</span> <span class="n">score_energy</span><span class="p">(</span><span class="n">hybridation_e</span><span class="p">)</span>
+            <span class="n">beacon_melting</span> <span class="o">=</span> <span class="n">melting_temperature</span><span class="p">(</span><span class="n">beacon</span><span class="p">)</span>
+            <span class="n">beacon_tm_score</span> <span class="o">=</span> <span class="n">beacon_tm</span><span class="p">(</span><span class="n">beacon_melting</span><span class="p">)</span>
+            <span class="n">beacon_score</span><span class="p">,</span> <span class="n">R_bn</span><span class="p">,</span> <span class="n">R_gr</span><span class="p">,</span> <span class="n">F_tm</span><span class="p">,</span> <span class="n">F_e</span><span class="p">,</span> <span class="n">hp</span> <span class="o">=</span> <span class="n">score_beacon</span><span class="p">(</span><span class="n">beacon</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="p">)),</span> <span class="n">gDNA</span><span class="p">)</span> <span class="c1"># score hecho con DNA</span>
+            <span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;beacon&quot;</span><span class="p">:</span>          <span class="n">beacon</span><span class="p">,</span>
+            <span class="s2">&quot;beacon_struct&quot;</span><span class="p">:</span>   <span class="n">beacon_struct</span><span class="p">,</span>
+            <span class="s2">&quot;beacon_mfe&quot;</span>   <span class="p">:</span>   <span class="n">beacon_mfe</span><span class="p">,</span>
+            <span class="s2">&quot;hybridation_e&quot;</span> <span class="p">:</span>  <span class="n">hybridation_e</span><span class="p">,</span>
+            <span class="s2">&quot;score_hybridation&quot;</span><span class="p">:</span> <span class="n">score_hybridation</span><span class="p">,</span>
+            <span class="s2">&quot;tm&quot;</span><span class="p">:</span>              <span class="n">beacon_melting</span><span class="p">,</span>
+            <span class="s2">&quot;tm_score&quot;</span><span class="p">:</span>        <span class="n">beacon_tm_score</span><span class="p">,</span>
+            <span class="s2">&quot;score&quot;</span><span class="p">:</span>           <span class="n">beacon_score</span><span class="p">,</span>
+            <span class="s2">&quot;R_bn&quot;</span><span class="p">:</span>            <span class="n">R_bn</span><span class="p">,</span>
+            <span class="s2">&quot;R_gr&quot;</span><span class="p">:</span>            <span class="n">R_gr</span><span class="p">,</span>
+            <span class="s2">&quot;F_tm&quot;</span><span class="p">:</span>            <span class="n">F_tm</span><span class="p">,</span>
+            <span class="s2">&quot;F_e&quot;</span> <span class="p">:</span>            <span class="n">F_e</span><span class="p">,</span>
+            <span class="s2">&quot;hp&quot;</span><span class="p">:</span>              <span class="n">hp</span><span class="p">,</span>
+            <span class="s2">&quot;stem1_len&quot;</span><span class="p">:</span>       <span class="n">stem1_len</span><span class="p">,</span>
+            <span class="s2">&quot;stem2_len&quot;</span><span class="p">:</span>       <span class="n">stem2_len</span><span class="p">,</span>
+            <span class="s2">&quot;loop_len&quot;</span><span class="p">:</span>        <span class="n">loop_len</span>
+            <span class="p">}</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># diseñar dichos primers</span>
+                <span class="n">raw_output</span> <span class="o">=</span> <span class="n">primer3_design_columbo</span><span class="p">(</span><span class="n">subseq</span><span class="p">,</span> <span class="n">pam_pos</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">parsed_primers</span> <span class="o">=</span> <span class="n">parse_primers_output</span><span class="p">(</span><span class="n">raw_output</span><span class="p">,</span> <span class="n">subseq</span><span class="p">)</span>
+                    <span class="n">score</span> <span class="o">=</span> <span class="n">score_primers</span><span class="p">(</span><span class="n">raw_output</span><span class="p">,</span> <span class="n">pam_pos</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span> <span class="n">protospacer_len</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span>
+                    <span class="n">primers_for_obj</span><span class="p">[</span><span class="n">pam_pos</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;primers&quot;</span><span class="p">:</span> <span class="n">parsed_primers</span><span class="p">,</span>
+                        <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="p">}</span>
+                    <span class="n">primer_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>  <span class="c1"># guardamos el score en la lista</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="c1"># Handle the case where no primers are found for this region</span>
+                    <span class="n">primers_for_obj</span><span class="p">[</span><span class="n">pam_pos</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+                    <span class="n">primer_failure</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># contador le añadimos + 1 cada vez que no pueda diseñar primers</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="c1"># Handle other errors in primer design</span>
+                <span class="n">primers_for_obj</span><span class="p">[</span><span class="n">pam_pos</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)}</span>
+                <span class="n">part_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="c1"># Aquí garantizamos que SIN EXCEPCIÓN o NO, midamos el tiempo</span>
+                <span class="n">part_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">columbo_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part_end</span> <span class="o">-</span> <span class="n">part_start</span><span class="p">)</span>
+
+    <span class="c1"># Al finalizar todos los bucles, medimos tiempo total</span>
+    <span class="n">time_end_total</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">total_time</span> <span class="o">=</span> <span class="n">time_end_total</span> <span class="o">-</span> <span class="n">time_start_total</span>  <span class="c1"># &lt;-- Métrica (A)</span>
+
+    <span class="c1"># especificamos el archivo que queremos</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;pickle&quot;</span><span class="p">:</span>
+        <span class="n">pickle_file</span> <span class="o">=</span> <span class="n">output_NGG_pickle</span><span class="p">(</span><span class="n">top_candidates</span><span class="p">)</span>
+        <span class="n">pickle_primers</span> <span class="o">=</span> <span class="n">output_primers_pickle</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 Archivos guardados: </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}</span><span class="s2">output_NGG.pkl, output_PRIMERS.pkl</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">json_file</span> <span class="o">=</span> <span class="n">output_NGG_json</span><span class="p">(</span><span class="n">top_candidates</span><span class="p">)</span>
+        <span class="n">json_primers</span> <span class="o">=</span> <span class="n">output_pimers_json</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 Archivos guardados: </span><span class="si">{</span><span class="n">RED</span><span class="si">}</span><span class="s2">output_NGG.json, output_PRIMERS.json</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- benchmarking ---</span>
+    <span class="n">numero_parts</span> <span class="o">=</span> <span class="n">total_parts</span>
+    <span class="n">numero_éxitos</span> <span class="o">=</span> <span class="n">numero_parts</span> <span class="o">-</span> <span class="n">primer_failure</span>
+    <span class="n">porcentaje_éxitos</span> <span class="o">=</span> <span class="p">(</span><span class="n">numero_éxitos</span> <span class="o">/</span> <span class="n">numero_parts</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">numero_parts</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">porcentaje_fallas</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">-</span> <span class="n">porcentaje_éxitos</span>
+
+    <span class="c1"># imprimir resultados del output ColumboParts</span>
+    <span class="k">for</span> <span class="n">seq_id</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">NGG_positions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;La Secuencia correspondiente con nombre: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">seq_id</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">, tiene </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> motivos NGG en las posiciones:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span> <span class="o">*</span> <span class="mi">170</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;&lt;&quot;</span> <span class="o">*</span> <span class="mi">170</span><span class="p">))</span>
+        <span class="c1"># en este caso no ponemos ningun return porque la funcion main() no la vamos a ejecutar en ningun lado y &quot;and&quot; me iba a devolver solo NGG_positions</span>
+        <span class="c1"># El operador and en Python devuelve el primer valor falsy que encuentre o, si no hay ninguno, devuelve el último valor evaluado.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🔬 Resultados de análisis COLUMBO:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">right_paren</span> <span class="o">=</span> <span class="n">beacon_struct</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="n">loop_dot</span> <span class="o">=</span> <span class="n">beacon_struct</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="n">left_paren</span> <span class="o">=</span> <span class="n">beacon_struct</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_candidates</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt; ColumboPart nº </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> &lt;&lt;&lt;&lt;&lt;&lt;&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creada con el archivo: 📁 route -&gt; </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">fasta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                           &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Region visual: &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">RED</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_region</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_region</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">())</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                           &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; PAM: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">3&#39;-- </span><span class="si">{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_pam</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">--5&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;                                                      &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Región donde hibrida el Beacon: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">5&#39;--</span><span class="si">{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">RED</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">--3&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Protospacer:             </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">5&#39;--</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">RED</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">--3&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">  de longitud </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">)</span><span class="si">}</span><span class="s2"> nt </span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Hebra complementaria:    </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">3&#39;--</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">)</span><span class="o">.</span><span class="n">complement</span><span class="p">())</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">--5&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> --&gt; Hebra complementaria del Protospacer&quot;</span> <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                                          &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Localización del protospacer en el genoma: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                           &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Temperatura de melting (Tm): </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_tm</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">°C</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Scores individuales = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_scores</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score global protospacer = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_score_medio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; TracrRNA Streptococcus pyogenes Cas9 </span><span class="si">{</span><span class="n">CIAN</span><span class="si">}{</span><span class="n">tracrRNA</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> de longitud = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">tracrRNA</span><span class="p">)</span><span class="si">}</span><span class="s2"> nt</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Guide RNA (gRNA) resultante </span><span class="si">{</span><span class="n">GR</span><span class="si">}</span><span class="s2">5&#39;--</span><span class="si">{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">RED</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;U&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span><span class="s2">&quot;U&quot;</span><span class="p">))</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">RED</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;U&quot;</span><span class="p">))</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">CIAN</span><span class="si">}{</span><span class="n">tracrRNA</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">GR</span><span class="si">}</span><span class="s2">--3&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> de longitud = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="nb">len</span><span class="p">(</span><span class="n">tracrRNA</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_protospacer</span><span class="p">)</span><span class="si">}</span><span class="s2"> nt</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                                          &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Diseño de Beacon: </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;beacon&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> con Score Global = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; RNAfold hairping generado </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;beacon_struct&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> --energía libre estrucutural--&gt; </span><span class="si">{</span><span class="n">RESET</span><span class="si">}{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;beacon_mfe&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> kcal/mol</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> y una Temperatura de melting </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;tm&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ºC</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score structural Beacon: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;hp&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score tm = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;tm_score&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Unión Beacon con Target mfe score = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;F_e&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score de hibridation (mfe) --&gt; comprobante = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;score_hybridation&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score R_beacon = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;R_bn&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">, Score R_guide = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;R_gr&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;                                                          &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Estructura stem -&gt; </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}</span><span class="s2">( &lt;-- </span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;stem1_len&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> se junta con </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}</span><span class="s2"> --&gt; )</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;stem2_len&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> con un loop de puntos </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}</span><span class="s2"> --&gt; .</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;loop_len&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">                        Beacon --&gt; </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;beacon&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Energía libre de hibridación = </span><span class="si">{</span><span class="n">GREEN</span><span class="si">}{</span><span class="n">beacons_for_obj</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">][</span><span class="s1">&#39;hybridation_e&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> kcal/mol</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">5&#39;--</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">AZU</span><span class="si">}{</span><span class="nb">str</span><span class="p">(</span><span class="n">Seq</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="p">))</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">YELL</span><span class="si">}</span><span class="s2">--3&#39;</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;                                                                                                                      </span><span class="si">{</span><span class="n">AZU</span><span class="si">}{</span><span class="n">obj</span><span class="o">.</span><span class="n">_beacon_site</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">primer_data</span> <span class="o">=</span> <span class="n">primers_for_obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_position</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">primer_data</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RED</span><span class="si">}</span><span class="s2">❌ ERROR: diseño de primers interrumpido</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">primer_data</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score de primer: </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="mi">0</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Primers diseñados: </span><span class="si">{</span><span class="n">MAG</span><span class="si">}{</span><span class="n">primer_data</span><span class="p">[</span><span class="s1">&#39;primers&#39;</span><span class="p">]</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Score de primers = </span><span class="si">{</span><span class="n">YELL</span><span class="si">}{</span><span class="n">primer_data</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="c1"># imprimir resultados</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">===== RESUMEN DE BENCHMARKING =====&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• Tiempo total de ejecución:</span><span class="se">\t</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> segundos&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• Total ColumboParts analizadas:</span><span class="se">\t</span><span class="si">{</span><span class="n">numero_parts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• ColumboParts con primers válidos:</span><span class="se">\t</span><span class="si">{</span><span class="n">numero_éxitos</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">porcentaje_éxitos</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> %)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• ColumboParts que fallaron:</span><span class="se">\t</span><span class="si">{</span><span class="n">primer_failure</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">porcentaje_fallas</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> %)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">columbo_times</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• Tiempo medio por ColumboPart:</span><span class="se">\t</span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">columbo_times</span><span class="p">)</span><span class="o">/</span><span class="n">numero_parts</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• Tiempo mínimo:</span><span class="se">\t</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">columbo_times</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;• Tiempo máximo:</span><span class="se">\t</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">columbo_times</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> s&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- (Opcional) Volcar lista de scores y tiempos en disco para análisis posterior ---</span>
+    <span class="c1"># Podrías hacer algo como:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;benchmark_scores.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">primer_scores</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;benchmark_times.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">columbo_times</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- Generamos un gráfico desde la CLI ---</span>
+    <span class="c1"># Usando matplotlib</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+        <span class="c1"># 1) Histograma de scores de primers</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">primer_scores</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribución de Scores de Primers&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Score&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Número de ColumboParts&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;histograma_scores.png&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># 2) Histograma de tiempos por ColumboPart</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">columbo_times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribución de Tiempos por ColumboPart&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Tiempo (s)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cantidad de ColumboParts&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;histograma_tiempos.png&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Gráficos guardados: histograma_scores.png, histograma_tiempos.png&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;⚠️ No se pudo generar gráficos: falta instalar matplotlib.&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=================================</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># para ejecutar la función como principal y que no de error</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Julio &lt;jcochenta@gmail.com&gt;, luksgrin &lt;lucas.goiriz@csic.es&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

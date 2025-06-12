@@ -1,13 +1,15 @@
-import sys
+if __name__ == "__main__":
 
-seq = sys.argv[1]
+    import sys
 
-long = len(seq)
+    seq = sys.argv[1]
 
-for nt in seq:
-    A = (seq.count("A")/long)*100
-    T = (seq.count("T")/long)*100
-    C = (seq.count("C")/long)*100
-    G = (seq.count("G")/long)*100
+    long = len(seq)
 
-print(f"El porcentage de cada A, T , C, G {A:.2f}% {T:.2f}% {C:.2f}% {G:.2f} %")
+    for nt in seq:
+        A = (seq.count("A")/long)*100
+        T = (seq.count("T")/long)*100
+        C = (seq.count("C")/long)*100
+        G = (seq.count("G")/long)*100
+
+    print(f"El porcentage de cada A, T , C, G {A:.2f}% {T:.2f}% {C:.2f}% {G:.2f} %")

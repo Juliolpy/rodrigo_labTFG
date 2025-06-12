@@ -2,13 +2,6 @@ import json
 import pickle
 import time
 
-# datos que vamos a guardar en archivos pickle y json
-data = {
-    "enzima": "BamHI",
-    "sitio": 30,
-    "meta": "BamHI es una enzima de restricción de tipo II producida por el microorganismo Bacillus amyloliquefaciens que posee una diana de restricción en el ADN de cadena doble dependiente de una secuencia no metilada, palindrómica y asimétrica, sobre la cual su actividad catalítica hidrolasa genera extremos cohesivos"
-}
-
 # hacemos la función que guarde los datos en el archivo json
 def save_json(data: dict, file_path : str) -> None: # esta funcion no devuelve nada, solo guarda el archivo
 
@@ -86,6 +79,12 @@ def read_pickle(file_path: str) -> dict:
     # la funcion que solo se ejecutara si ejecutamos el script como main
 
 def main() -> None:
+    # datos que vamos a guardar en archivos pickle y json
+    data = {
+        "enzima": "BamHI",
+        "sitio": 30,
+        "meta": "BamHI es una enzima de restricción de tipo II producida por el microorganismo Bacillus amyloliquefaciens que posee una diana de restricción en el ADN de cadena doble dependiente de una secuencia no metilada, palindrómica y asimétrica, sobre la cual su actividad catalítica hidrolasa genera extremos cohesivos"
+    }
 
     # llamamos a la función de guardar datos de json y pickle
     # JSON

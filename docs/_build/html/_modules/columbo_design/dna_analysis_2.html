@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>columbo_design.dna_analysis_2 &mdash; Columbo Design 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Columbo Design
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Columbo Design</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">columbo_design.dna_analysis_2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for columbo_design.dna_analysis_2</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<div class="viewcode-block" id="search_restriction_sites">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.dna_analysis_2.search_restriction_sites">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">search_restriction_sites</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">enzyme_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span> <span class="c1"># devuelve una lista</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Busca los sitios de corte de una enzima de restricción específica en una secuencia de ADN.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        sequence (str): Secuencia de ADN a analizar.</span>
+<span class="sd">        enzyme_name (str): Nombre de la enzima a buscar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Número de coincidencias y lista de posiciones donde se encuentra el patrón.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Definimos los sitios de corte de algunas enzimas de restricción</span>
+    <span class="n">enzymes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;BamHI&quot;</span><span class="p">:</span> <span class="s2">&quot;GGATCC&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;HindIII&quot;</span><span class="p">:</span> <span class="s2">&quot;AAGCTT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SalI&quot;</span><span class="p">:</span> <span class="s2">&quot;GTCGAC&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;EcoRI&quot;</span><span class="p">:</span> <span class="s2">&quot;GAATTC&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NotI&quot;</span><span class="p">:</span> <span class="s2">&quot;GC.NGC&quot;</span><span class="p">,</span>  <span class="c1"># Se usa &quot;.&quot; en regex para &quot;N&quot; (cualquier base)</span>
+        <span class="s2">&quot;BsmI&quot;</span><span class="p">:</span> <span class="s2">&quot;GA.STC&quot;</span>   <span class="c1"># Se usa &quot;.&quot; en regex para &quot;S&quot; (G o C)</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Verificamos si la enzima está en el diccionario</span>
+    <span class="k">if</span> <span class="n">enzyme_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">enzymes</span><span class="p">:</span> <span class="c1">#  En Python, cuando usas in con un diccionario, por defecto se buscan coincidencias en las claves (keys), no en los valores.</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Enzyme not found or incorrect name provided&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span> <span class="c1"># añade valores None si no se encunentra la enzima</span>
+
+    <span class="c1"># Obtener el patrón de la enzima</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">enzymes</span><span class="p">[</span><span class="n">enzyme_name</span><span class="p">]</span> <span class="c1"># aqui igualamos los values del diccionario a pattern, osea las secuencias que reconocen las enzimas</span>
+    <span class="c1">#--&gt; enzymes[enzyme_name] accede a la secuencia de corte de la enzima especificada en enzyme_name dentro del diccionario enzymes</span>
+    <span class="c1"># Buscar coincidencias en la secuencia</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">sequence</span><span class="p">))</span> <span class="c1"># cuantas veces se ha encontrado, convierte el iterador de objetos en una lista</span>
+
+    <span class="c1"># Extraer las posiciones donde se encuentran las coincidencias, la primera posicion de cada</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">),</span> <span class="n">positions</span></div>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../columbo_design.html#columbo_design.dna_analysis_2.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Pedimos la secuencia al usuario</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Introduce la secuencia de ADN de interés: &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="c1"># Pedimos la enzima que quiere buscar</span>
+    <span class="n">enzyme_name</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;¿Qué enzima deseas buscar? (BamHI, HindIII, SalI, EcoRI, NotI, BsmI): &quot;</span><span class="p">)</span>
+
+    <span class="c1"># Buscamos los sitios de corte</span>
+    <span class="n">num_matches</span><span class="p">,</span> <span class="n">positions</span> <span class="o">=</span> <span class="n">search_restriction_sites</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">enzyme_name</span><span class="p">)</span>
+
+    <span class="c1"># Si hubo error en la búsqueda, terminamos el programa</span>
+    <span class="k">if</span> <span class="n">num_matches</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Mostramos el resultado</span>
+    <span class="k">if</span> <span class="n">num_matches</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No se encontraron sitios de corte para la enzima </span><span class="si">{</span><span class="n">enzyme_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">coincidencias</span> <span class="o">=</span> <span class="s2">&quot;coincidencia&quot;</span> <span class="k">if</span> <span class="n">num_matches</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;coincidencias&quot;</span>
+        <span class="n">posicion_texto</span> <span class="o">=</span> <span class="s2">&quot;posición&quot;</span> <span class="k">if</span> <span class="n">num_matches</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;posiciones&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Se encontraron </span><span class="si">{</span><span class="n">num_matches</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">coincidencias</span><span class="si">}</span><span class="s2"> en las </span><span class="si">{</span><span class="n">posicion_texto</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s2"> para la enzima </span><span class="si">{</span><span class="n">enzyme_name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Julio &lt;jcochenta@gmail.com&gt;, luksgrin &lt;lucas.goiriz@csic.es&gt;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
