@@ -133,7 +133,8 @@ def main() -> None:
                     score = score_primers(raw_output, pam_pos - start, protospacer_len = 25)
                     primers_for_obj[pam_pos] = {
                         "primers": parsed_primers,
-                        "score": round(score, 2)
+                        "score": round(score, 2),
+                        "all_output": raw_output
                     }
                     primer_scores.append(score)  # guardamos el score en la lista
                 except ValueError as exc:
@@ -156,11 +157,11 @@ def main() -> None:
     # especificamos el archivo que queremos
     if args.output == "pickle":
         pickle_file = output_NGG_pickle(top_candidates)
-        pickle_primers = output_primers_pickle(raw_output)
+        pickle_primers = output_primers_pickle(primers_for_obj)
         print(f"💾 Archivos guardados: {GREEN}output_NGG.pkl, output_PRIMERS.pkl{RESET}")
     else:
         json_file = output_NGG_json(top_candidates)
-        json_primers = output_pimers_json(raw_output)
+        json_primers = output_pimers_json(primers_for_obj)
         print(f"💾 Archivos guardados: {RED}output_NGG.json, output_PRIMERS.json{RESET}")
 
     # --- benchmarking ---

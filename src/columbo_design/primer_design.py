@@ -49,7 +49,7 @@ def primer3_design_columbo(seq: str, pam_pos: int) -> dict:
       'PRIMER_MAX_TM':             65,
       'PRIMER_MIN_GC':             30,
       'PRIMER_MAX_GC':             70,
-      'PRIMER_NUM_RETURN':         5,
+      'PRIMER_NUM_RETURN':         1,
       'PRIMER_TASK': 'generic',
    }
    global_args = {}
