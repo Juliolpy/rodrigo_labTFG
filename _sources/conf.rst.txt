@@ -1,7 +1,7 @@
-core module
+conf module
 ===========
 
-.. automodule:: core
+.. automodule:: conf
    :members:
    :show-inheritance:
    :undoc-members:
