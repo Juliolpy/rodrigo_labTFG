@@ -240,10 +240,10 @@ def main() -> None:
 
     # --- (Opcional) Volcar lista de scores y tiempos en disco para análisis posterior ---
     # Podrías hacer algo como:
-    with open("benchmark_scores.txt", "w") as f:
+    with open(f"benchmark_{seq_id}_scores.txt", "w") as f:
         for s in primer_scores:
             f.write(f"{s:.4f}\n")
-    with open("benchmark_times.txt", "w") as f:
+    with open(f"benchmark_{seq_id}_times.txt", "w") as f:
         for t in columbo_times:
             f.write(f"{t:.4f}\n")
 
@@ -259,7 +259,7 @@ def main() -> None:
         plt.xlabel("Score")
         plt.ylabel("Número de ColumboParts")
         plt.tight_layout()
-        plt.savefig("histograma_scores.png")
+        plt.savefig(f"histograma_{seq_id}_scores.png")
         plt.close()
 
         # 2) Histograma de tiempos por ColumboPart
@@ -269,7 +269,7 @@ def main() -> None:
         plt.xlabel("Tiempo (s)")
         plt.ylabel("Cantidad de ColumboParts")
         plt.tight_layout()
-        plt.savefig("histograma_tiempos.png")
+        plt.savefig(f"histograma_{seq_id}_tiempos.png")
         plt.close()
 
         print(f"✅ Gráficos guardados: {YELL}{seq_id}_scores.png, {seq_id}_tiempos.png{RESET}")
