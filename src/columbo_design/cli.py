@@ -272,7 +272,7 @@ def main() -> None:
         plt.savefig(f"histograma_{seq_id}_tiempos.png")
         plt.close()
 
-        print(f"✅ Gráficos guardados: {YELL}{seq_id}_scores.png, {seq_id}_tiempos.png{RESET}")
+        print(f"✅ Gráficos guardados: {YELL}histograma_{seq_id}_scores.png, histograma_{seq_id}_tiempos.png{RESET}")
     except ImportError:
         print(f"⚠️ {RED}No se pudo generar gráficos {RESET}: {YELL}falta instalar matplotlib.{RESET}")
 
