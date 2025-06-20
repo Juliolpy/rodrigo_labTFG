@@ -215,7 +215,7 @@ def main() -> None:
             print("                                                          ")
             print(f" Estructura stem -> {GREEN}( <-- {RESET} {YELL}{beacons_for_obj[obj._position]['stem1_len']}{RESET} se junta con {GREEN} --> ){RESET} {YELL}{beacons_for_obj[obj._position]['stem2_len']}{RESET} con un loop de puntos {GREEN} --> .{RESET} {YELL}{beacons_for_obj[obj._position]['loop_len']}{RESET}                        Beacon --> {GREEN}{beacons_for_obj[obj._position]['beacon']}{RESET}")
             print(f" Energía libre de hibridación = {GREEN}{beacons_for_obj[obj._position]['hybridation_e']:.4f} kcal/mol{RESET}, con la hebra complementaria al protospacer(HEBRA DESPLAZADA): {YELL}5'--{RESET} {AZU}{str(Seq(obj._beacon_site))}{RESET} {YELL}--3'{RESET}")
-            print(f"                                                                                                                      {AZU}{obj._beacon_site[:32]}{RESET}")
+            print(f"                                                                                                                      {AZU}{obj._beacon_site[:32 ]}{RESET}")
             primer_data = primers_for_obj.get(obj._position, {})
             if "error" in primer_data:
                 print(f"{RED}❌ ERROR: diseño de primers interrumpido{RESET} {primer_data['error']}")
@@ -227,10 +227,12 @@ def main() -> None:
 
     # imprimir resultados
     print("\n\n===== RESUMEN DE BENCHMARKING =====")
-    print(f"• Tiempo total de ejecución:\t{total_time:.2f} segundos")
-    print(f"• Total ColumboParts analizadas:\t{numero_parts}")
-    print(f"• ColumboParts con primers válidos:\t{numero_éxitos} ({porcentaje_éxitos:.1f} %)")
-    print(f"• ColumboParts que fallaron:\t{primer_failure} ({porcentaje_fallas:.1f} %)")
+    print(f" --> creado con : {GREEN}{args.fasta}{RESET} <--")
+    print(f" Correspondiente a la secuencia : {YELL}{seq_id}{RESET}")
+    print(f"• Tiempo total de ejecución: \t{total_time:.2f} segundos")
+    print(f"• Total ColumboParts analizadas: \t{numero_parts}")
+    print(f"• ColumboParts con primers válidos: {GREEN}\t{numero_éxitos} ({porcentaje_éxitos:.1f} %){RESET}")
+    print(f"• ColumboParts que fallaron: {RED}\t{primer_failure} ({porcentaje_fallas:.1f} %){RESET}")
     if columbo_times:
         print(f"• Tiempo medio por ColumboPart:\t{sum(columbo_times)/numero_parts:.3f} s")
         print(f"• Tiempo mínimo:\t{min(columbo_times):.3f} s")
@@ -270,9 +272,9 @@ def main() -> None:
         plt.savefig("histograma_tiempos.png")
         plt.close()
 
-        print("✅ Gráficos guardados: histograma_scores.png, histograma_tiempos.png")
+        print(f"✅ Gráficos guardados: {YELL}histograma_scores.png, histograma_tiempos.png{RESET}")
     except ImportError:
-        print("⚠️ No se pudo generar gráficos: falta instalar matplotlib.")
+        print(f"⚠️ {RED}No se pudo generar gráficos {RESET}: {YELL}falta instalar matplotlib.{RESET}")
 
     print("=================================\n\n")
 
