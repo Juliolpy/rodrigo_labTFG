@@ -64,7 +64,7 @@ class ColumboParts:
          raise Out_of_frame_ERROR("El protospacer no tiene el tamaño requerido --> 20 nt upstream PAM")
       self._protospacer = sequence[position - 25 : position + 3]
       self._beacon_site = sequence[position - 50: position + 3]
-      self._region = sequence[position - 100: position + 70]
+      self._region = sequence[position - 70: position + 100]
       self._position = position
       self._scores = self.calcular_scores ()
       self._score_medio = sum(self._scores) / len(self._scores) if self._scores else 0 # basicamente la suma de los números que da el return de la funcion scores entre su lenght que siempre será 4
