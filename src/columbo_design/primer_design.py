@@ -148,6 +148,7 @@ def parse_primers_output(output, region):
         "left_primer": left_primer,
         "left_primer_comp": str(Seq(left_primer).complement()),
         "right_primer": right_primer,
+        "right_primer_rev" : str(right_primer[::-1]),
         "right_primer_revcomp" : str(Seq(right_primer).reverse_complement())
     }
 
