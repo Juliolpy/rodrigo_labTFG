@@ -14,6 +14,7 @@ from columbo_design.beacon import (
     count_hairpin,
     design_beacon,
     score_beacon,
+    penalize_structure_dot_bracket
 )
 
 # 1) fold_beacon → devuelve (struct, mfe)
@@ -93,3 +94,18 @@ def test_score_beacon():
     assert 0.0 <= F_tm <= 1.0
     assert 0.0 <= F_e <= 1.0
     assert 0.0 <= hp   <= 1.0
+# 11) penalización de la estructura del beacon
+def test_penalize_structure_dot_bracket():
+    # Estructura válida: loop central y stems definidos
+    good_struct = "((((((((.....))))))))"
+    # Estructuras inválidas
+    bad_struct_1 = "((.(((....))).))"
+    bad_struct_2 = ".((((((....))))))."
+
+    penalice_good = penalize_structure_dot_bracket(good_struct)
+    penalice_bad_1 = penalize_structure_dot_bracket(bad_struct_1)
+    penalice_bad_2 = penalize_structure_dot_bracket(bad_struct_2)
+
+    assert penalice_good == 1
+    assert penalice_bad_1 == 0
+    assert penalice_bad_2 == 0
