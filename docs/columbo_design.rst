@@ -32,11 +32,6 @@ Unit Tests
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: tests.cli_pytest
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. automodule:: tests.beacon_pytest
    :members:
    :undoc-members:
