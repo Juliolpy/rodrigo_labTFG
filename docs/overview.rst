@@ -1,4 +1,8 @@
 Overview
 ========
 
-Aquí va el resumen de mi trabajo.
+In this project, Columbo Design was developed as a computational environment for the rational design and evaluation of primer pairs and molecular beacon probes targeting protospacer regions recognized by the CRISPR-Cas9 system. This tool integrates sequence analysis, thermodynamic modeling, and genomic context evaluation to facilitate the generation of optimized detection systems for specific nucleic acids.
+The core of the software is based on a scoring algorithm that quantifies the quality of both primer positioning and beacon hybridization with the displaced strand. The system penalizes suboptimal features, such as primer overlap with the protospacer region or beacon hybridization outside the loop region, and favors configurations that preserve the integrity of the target sequence. Key parameters such as melting temperature (\mathbit{T}_\mathbit{m}), GC content, and free hybridization energy (ΔG) are evaluated alongside structural criteria, ensuring robust and specific designs. Columbo Design also enables the structural assessment of nucleic acids using dot-bracket notation, providing rational insight into the detection construct design. The pipeline has been applied to genomic sequences of SARS-CoV-2 (NCBI RefSeq: NC_045512.2.) and MERS-CoV (NCBI RefSeq: LV469811.1.), reproducing optimal design parameters consistent with previous literature.
+This tool is particularly valuable for researchers in synthetic biology, molecular diagnostics, and CRISPR-based detection systems, as it enables automated and rational design of constructs that maximize target specificity and experimental reliability.
+
+Keywords: software, CRISPR-Cas9, design, primers, beacon, protospacer, modeling, algorithm, dot-bracket, sequences.
