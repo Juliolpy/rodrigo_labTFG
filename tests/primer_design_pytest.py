@@ -7,7 +7,11 @@ from Bio.Seq import Seq
 # 1️ Test de primer3_design_columbo
 def test_primer3_design_columbo_basic():
     """
-    Test básico: comprobar que primer3_design_columbo devuelve un diccionario con claves esperadas.
+    Basic test for `primer3_design_columbo`.
+
+    This test verifies that the function returns a dictionary containing 
+    at least the expected primer keys when given a valid DNA sequence 
+    and a PAM site position.
     """
     # Creamos una secuencia artificial suficientemente larga
     seq = "AAGCTGATCGCTAACAAGTTCAACCAAGCCCTGGGCGCTATGCAGACCGGATTCACCACTACAAACGAAGCCTTCCGTAAGGTGCAAGACGCTGTCAACAACAACGCCCAGGCTCTCTCCAAGTTGGCCTCCGAGCTGTCTAACACCTTCGGCGCCATCTCTGCTAGCATCGGAGATATCATCCAGCGTCTGGACGTGCTCGAGCAGGATGCTCAAATCG"
@@ -22,7 +26,10 @@ def test_primer3_design_columbo_basic():
 # 2️ Test de score_primers
 def test_score_primers():
     """
-    Test de score_primers con una simulación de output de Primer3.
+    Unit test for `score_primers`.
+
+    It simulates a valid Primer3 output and checks that the resulting score 
+    is within the expected range [0.0, 1.0], ensuring the function's correctness.
     """
     # Simulamos un output de Primer3 válido
     output_mock = {
@@ -44,7 +51,10 @@ def test_score_primers():
 # 3️ Test de parse_primers_output
 def test_parse_primers_output():
     """
-    Test de parse_primers_output: comprobar extracción de secuencias.
+    Unit test for `parse_primers_output`.
+
+    Checks that the function correctly extracts left and right primer sequences, 
+    their reverse complements, and returns them in a structured dictionary format.
     """
     output_mock = {
         "PRIMER_LEFT_0": (10, 20),
@@ -66,7 +76,10 @@ def test_parse_primers_output():
 # 4️ Test de output_pimers_json
 def test_output_pimers_json(tmp_path):
     """
-    Test de output_pimers_json: verificar escritura y lectura correcta.
+    Test for `output_pimers_json`.
+
+    Verifies that the function can successfully serialize Primer3 output 
+    into a JSON file and that the resulting dictionary contains the expected keys.
     """
     output_mock = {
         "PRIMER_LEFT_0": (10, 20),
@@ -94,7 +107,10 @@ def test_output_pimers_json(tmp_path):
 # 5️ Test de output_primers_pickle
 def test_output_primers_pickle(tmp_path):
     """
-    Test de output_primers_pickle: verificar escritura y lectura con pickle.
+    Test for `output_primers_pickle`.
+
+    Validates that the function correctly pickles Primer3 output and 
+    returns a list or dictionary with the expected structure.
     """
     output_mock = {
         "PRIMER_LEFT_0": (10, 20),
