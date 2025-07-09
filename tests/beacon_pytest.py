@@ -23,6 +23,8 @@ def test_fold_beacon():
 
     Checks that the function returns a valid RNA secondary structure string 
     and a minimum free energy (MFE) value for a given DNA sequence.
+    :param: hola
+    :type: str
     """
     dna = "GCGCGCATAAAAAAATATGCGCGC"
     struct, mfe = fold_beacon(dna)
